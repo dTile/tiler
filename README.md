@@ -49,7 +49,7 @@ console.log(tbox.gridJSON);
 
 <br>
 
-[Demo](https://dtile.github.io/DT/test/)
+[Demo](https://dtile.github.io/tiler/test/)
 
 <hr>
 
