@@ -30,7 +30,7 @@ var tile = DT.find(0,0,2);
 tile.p=6; //set the decimal precision of the bounding coordinates to 6;
 
 var tbox = tile.surround(10);
-//instantiate a tile box that surrounds tile with 10 tiles in each side;
+//instantiate a tile-box (tbox) that surrounds "tile" with 10 tiles in each side;
 
 
 console.log(tile.coords); 
@@ -38,16 +38,12 @@ console.log(tbox.coords);
 //print the corners' coordinates
 
 console.log(tbox.gridJSON);
-//createprint the corners' coordinates
+//Output a geoJSON string with all tbox tiles
 
 
 ```
 <br>
 
-
-[About](explainer/benefits.md)
-
-<br>
 
 [Demo](https://dtile.github.io/tiler/test/)
 
