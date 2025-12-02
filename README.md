@@ -1,4 +1,5 @@
-<h3>Decimal Tiles</h3>
+<h3>Tiler</h3>
+<h4>Adding floating grids and tiles on maps</h4>
 Decimal tiles enable a unified referring system for areas on the surface of the earth instead of an alternative or complementary set of coordinates by using unique numbers, overcoming the cumbersome use of vectors, commas, degrees, minutes, seconds and bearings. Decimal tiles split a navigation map or Meracator projected map into 10 x 10 matrices of polygons. The polygons visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature. Each drill-down level splits a tile from a previous zoom level into 100 new tiles enabling granularity as required by the context. Decimal tiles can be represented by one number instead of a vector by concatenating the drill-down level with row number and column number (padded with zeros). A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
 <br>
 
@@ -10,7 +11,7 @@ A perimeter is defined by adding a perimeter threshold (p) to a decimal tile vec
 
 ###
 ``` html
-<script src="https://cdn.jsdelivr.net/gh/dTile/DT/dist/dtile.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/dTile/tiler/dist/tiler.js"></script>
 ```
 
 
@@ -19,15 +20,25 @@ A perimeter is defined by adding a perimeter threshold (p) to a decimal tile vec
 ###
 ```
 // vanilla JS
-// 
-var geoJSON = DT.perimJSON(25050,3);
-//get a perimeter of threshold 3 around "Null Island" in zoom level 2;
-//
+var tile = new DT.Tile(2,50,50);
+or
+var tile = new DT.Tile(25050);
+or
+var tile = DT.find(0,0,2);
 
-var tile = DT.dtXYZ(51,51,2)
-console.log(tile.coords);
-//Get the tile located 51 tiles south of the north pole and one tile east to the meridian at zoom level 2
-//In zoom level 2 the map is split to 100x100 tiles;
+ // Intantiate a tile that encloses "Null Island" in granularity level 2
+tile.p=6; //set the decimal precision of the bounding coordinates to 6;
+
+var tbox = tile.surround(10);
+//instantiate a tile box that surrounds tile with 10 tiles in each side;
+
+
+console.log(tile.coords); 
+console.log(tbox.coords);
+//print the corners' coordinates
+
+console.log(tbox.gridJSON);
+//createprint the corners' coordinates
 
 
 ```
