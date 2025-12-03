@@ -50,14 +50,11 @@ A corresponding geoJSON file can be suppoerimposed on a  mapping application
 
 <h3>Solution</h3>
 
-The algorithm uses the tiler API to generate a list of tiles that make up the corresponding perimeters which are exported to a cross platform geoJSON file.
-
-[geoJSON](/media/EatonTiles.json) or
-[eatontiles.json](https://github.com/dTile/tiler/blob/e6dbb86b990ac5310382bad2dea94e9cb86e8034/docs/media/eatonTiles.json)
+The algorithm uses the tiler API to generate a list of tiles that make up the corresponding perimeters which are exported to a cross platform [geoJSON](https://github.com/dTile/tiler/blob/e6dbb86b990ac5310382bad2dea94e9cb86e8034/docs/media/eatonTiles.json) file.
 
 <details>
 <summary>
-EatonTiles.json
+[geoJSON](./media/EatonTiles.json)
 </summary>
 <pre>
 {
