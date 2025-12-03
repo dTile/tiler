@@ -49,9 +49,13 @@ A corresponding geoJSON file can be suppoerimposed on a a mapping application
 
 The algorithm uses the tiler API to generate a list of tiles that make up the corresponding perimeters which are exported to a cross platform geoJSON file.
 
-[geoJSON](https://dtile.github.io/tiler/media/EatonTiles.json) 
+[geoJSON](/media/EatonTiles.json) 
 
-[tiles.json](../media/EatonTiles.json)
+[tiles.json](https://dtile.github.io/tiler/media/EatonTiles.json)
+
+
+
+<hr>
 
 
 The file can be superimposed on a map application which may enable a web service that calcuates the distance to an evacuation area or a smoke impact area.
@@ -60,5 +64,10 @@ If a higher resolution is needed the granularity level can be increased. Perimte
 
 ![Perimeter](https://dtile.github.io/tiler/media/EatonTiles.png?raw=true)
 
+<hr>
 
+[Read more on the tiling Concept](https://dtile.github.io/tiler/concept/motivation)
 
+<br>
+
+[Demo](https://dtile.github.io/tiler/test/)
