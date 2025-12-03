@@ -14,6 +14,7 @@ The use of tiled perimeters has the following benfits:
 </ol>
 </p>
 
+<HR>
 
 <h3>Use Case - Eaton Fire</h3>
 
@@ -22,12 +23,12 @@ Depicting an imaginary impact/evacuation area and a larger smoke effect perimete
 
 <h4>Raw sources</h4>
 
-A geoJSON map delimits tha area of the Eaton Fire that took place in California which engulfed about 14,000 acres. 
+A geoJSON map delimits the area of the "Eaton Fire" that took place in California and engulfed about 14,000 acres. 
 The map is available at 
 [https://gis.data.cnra.ca.gov/](https://gis.data.cnra.ca.gov/datasets/CALFIRE-Forestry::ca-perimeters-cal-fire-nifc-firis-public-view/explore)
 
 A corresponding geoJSON file can be suppoerimposed on a  mapping application
-[geoJSON](/media/firisEaton.geojson) 
+[geoJSON](../media/firisEaton.geojson) 
 
 
 <h4>Methodology</h4>
