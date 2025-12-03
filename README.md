@@ -21,47 +21,39 @@ A perimeter is defined by adding a perimeter threshold (p) to a decimal tile vec
 ```
 // Intantiate a tile that encloses "Null Island" in granularity level 2
 var tile = DT.find(0,0,2);
-or
+//or
 var tile = new DT.Tile(2,50,50);
-or
+//or
 var tile = new DT.Tile(25050);
 
-
-tile.p=6; //set the decimal precision of the bounding coordinates to 6;
-
-var tbox = tile.surround(10);
-//instantiate a tile-box (tbox) that surrounds "tile" with 10 tiles in each side;
-
-
+//set the decimal precision to 6 and get the bounding coordinates;
+tile.p=6;
 console.log(tile.coords); 
-console.log(tbox.coords);
-//print the corners' coordinates
 
-console.log(tbox.gridJSON);
+//instantiate a tile-box (tbox) that surrounds "tile" with 10 tiles in each side and print corners' coordinates;
+var tbox = tile.surround(10);
+console.log(tbox.coords);
+
 //Output a geoJSON string with all tbox tiles
+console.log(tbox.gridJSON);
 
 
 ```
 <br>
 
-[Demo](https://dtile.github.io/tiler/test/)
+[View a tile or a tilebox on a map](https://dtile.github.io/tiler/test/)
 
 <br>
-
 [Use Case](https://dtile.github.io/tiler/concept/usecase)
 
 
 <hr>
-
 ![Demo use](https://dtile.github.io/DT/test/dt.png?raw=true)
-
-
 
  <hr>
   
 > [!NOTE]
 > Tiles visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature under the Mercator projection model.
-
 
  
 <h3>License</h3>
