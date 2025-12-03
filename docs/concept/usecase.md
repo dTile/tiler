@@ -51,7 +51,7 @@ The algorithm uses the tiler API to generate a list of tiles that make up the co
 
 [geoJSON](https://dtile.github.io/tiler/media/EatonTiles.json) 
 
-[View tiles.json](./media/EatonTiles.json)
+[tiles.json](../media/EatonTiles.json)
 
 
 The file can be superimposed on a map application which may enable a web service that calcuates the distance to an evacuation area or a smoke impact area.
