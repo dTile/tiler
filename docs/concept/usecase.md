@@ -1,6 +1,6 @@
 <h3>Tiler - Use Case</h3>
       
-<h4>How can tiling help in mapping applications</h4>
+<h4>How can tiling help in mapping applications?</h4>
 <p>
 Perimeter tiling helps demarking areas needed for geo-business applications or for response management operations before or during disaster events such as fires, floods or a dam collapse / overflooding.
 A tiled perimeter is better than the conventional area partitioning that depends on county boundaries or other non-symateric method and that does't cover same size areas. This anomaility makes some perimeters significantly bigger when compared to others which may create false alarms to far areas and undermine an efficient distribution of response teams and equipment.
@@ -38,13 +38,13 @@ A corresponding geoJSON file can be suppoerimposed on a  mapping application
   <ol>
   <li>Create a list of all enclosed tiles which are inside the polygon (perimeter #0)</li>
   <li>For each vertice check what tile encloses that vertice</li>
-  <li>Filter repetitive polygons - create a border list of tiles (Perimeter #1)</li>
-  <li>Create a perieter ring by finding all tiles that are adjacent to the border tiles and are not part of the enclosed tiles (pereimeter #2 and so on)</li>
-  <li>If the perimeter threshold is bigger than 1 find the adjacent tiles to the base perimeter ring and so on</li>
+  <li>Filter repetitive tiles - create a border list of tiles (Perimeter #1)</li>
+  <li>Create a perimeter with threshold 1 by finding all tiles that are adjacent to the border tiles and are not part of the enclosed tiles (pereimeter #2 and so on)</li>
+  <li>If the perimeter threshold is bigger than 1 find the adjacent tiles to the threshold 1 and make threshold 2... and so on</li>
   
   </ol>
   <li>Merge the tile perimeters by removing tiles that are in higher perimeters if they are part of the lower perimeter and fileter repetitions</li>
-  <li>Assign property to each perimeter assign a status, propeterty and/or color</li>
+  <li>Assign property to each perimeter such as a status, propeterty and/or color or a callback function</li>
   <li>Create the geoJSON export file by retrieving the coordinates of the tiles and assiging the properties</li>
 </ol>
 
