@@ -36,18 +36,18 @@ console.log(tbox.coords);
 
 //Output a geoJSON string with all tbox tiles
 console.log(tbox.gridJSON);
-
-
 ```
 <br>
 
 [View a tile or a tilebox on a map](https://dtile.github.io/tiler/test/)
 
 <br>
+
 [Use Case](https://dtile.github.io/tiler/concept/usecase)
 
 
 <hr>
+
 ![Demo use](https://dtile.github.io/DT/test/dt.png?raw=true)
 
  <hr>
