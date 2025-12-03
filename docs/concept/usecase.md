@@ -54,7 +54,7 @@ The algorithm uses the tiler API to generate a list of tiles that make up the co
 
 <details>
 <summary>
-[geoJSON](./media/EatonTiles.json)
+EatonTiles.json
 </summary>
 <pre>
 {
