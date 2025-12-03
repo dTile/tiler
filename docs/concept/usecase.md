@@ -70,4 +70,4 @@ If a higher resolution is needed the granularity level can be increased. Perimte
 
 <br>
 
-[Demo](https://dtile.github.io/tiler/test/)
+[Convert Tile to coordinates](https://dtile.github.io/tiler/test/)
