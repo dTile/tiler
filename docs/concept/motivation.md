@@ -1,3 +1,4 @@
+<h2>Tiler - Tiling Algorithms</h2>
 <h3>Motivation</h3>
 The decimal tile system (DTS), enables a unified global area definition without a need to specify coordinats or a clumsy system of comma delimited arrays or degrees, minutes and seconds. It may solve the problem of governments and lifesaving entities who don't use a well defined and unified system of proveying, understandable, comparable, traceable and unifed permiters needed for evacuations, alrest and coordination of response teams. Some governments or counties use their own asymetrical and incoherent delimiting systems because they are afraid of sxposing coordinates of priveate properties or because they want to create inneficient budgeting system that give more possibilites of money laundring or manipulative biddings by the use of red tape and inequal areas sizin and zoning.
 
@@ -19,5 +20,5 @@ A decimal tile in a specific zoom level has the corners defined by splitting a t
 </p>
 
 
-![Demo use](https://dtile.github.io/DT/test/dt.png?raw=true)
+![Demo use](https://dtile.github.io/tiler/media/tiles.png?raw=true)
 
