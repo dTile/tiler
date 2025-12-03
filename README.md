@@ -4,13 +4,13 @@ Decimal tiles enable a unified shorthanded notation system for areas on the surf
 <br>
 <h3>Tile</h3>
 
-A "tile" is an object that is constructed by g,x and y parameters. "g" represents the granualrity x the distance in tiles from the anti-meridian to the east and y the distance in tiles from the north pole. The API calculates the tile boundaries with its method "coords" and can "inflate" a tile into a tilebox.
+A "tile" is an object that is constructed by g,x and y parameters. "g" represents the granualrity, x the distance in tiles from the anti-meridian to the east and y the distance in tiles from the north pole. The API calculates the tile boundaries with its method "coords" and can be "inflated" into a tile-box.
 Granularity level 1 covers a basic Mercator projection layer with 100 tiles or (10 x 10). 
 In granuarity 2 the Base offset contains 100 x 100 tiles and so on.
 The base offset (or 0) is the area confined by [90&deg;,-180&deg;] in the northwest and [-90&deg;.180&deg;] in the southeast. A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
 
 <h3>Tbox - Tile box</h3>
-A tile box represents a rectangular perimeter that contains tiles. It is instantiated by assigning an anchor tile and increments to the east and south. A Tbox is denoted by concatenating a dot and the x and y thresholds. The API can convert a tile to a tilebox by surrounding it and has methods that create the lines or geoJSON string that represent it. Thus the use of a Tbox is effective when suppoerimposin floating grids on mapping systems or naviagation applications.
+A tile box represents a quadrilateral perimeter that contains tiles. It is instantiated by assigning an anchor tile number and increments to the east and south. A Tbox is denoted by concatenating a dot and the xi and yi thresholds. The API can convert a tile to a tilebox by surrounding it or extending it or using a function that has the coordinates of opposing corners. A Tbox has methods that create the set of coordinates that represent grid lines or geoJSON string that includes the coordinates of its tiles. Thus, the use of a Tbox is effective when suppoerimposing floating grids of different sizes on mapping systems or naviagation applications.
 <br>
 
 <h3>CDN</h3>
