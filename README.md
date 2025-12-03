@@ -34,7 +34,8 @@ var tile = new DT.Tile(25050);
 
 //set the decimal precision to 6 and get the bounding coordinates;
 tile.p=6;
-console.log(tile.coords); 
+console.log(tile.coords);
+// result [[0,0],[0,3.6],[-3.597634,3.6],[-3.597634,0]]
 
 //instantiate a tile-box (tbox) that surrounds "tile" with 10 tiles in each side and print corners' coordinates;
 var tbox = tile.surround(10);
