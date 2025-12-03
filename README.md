@@ -55,7 +55,7 @@ console.log(tbox.gridJSON);
 
 <hr>
 
-![Demo use](https://dtile.github.io/DT/test/dt.png?raw=true)
+![Demo use](https://dtile.github.io/tiler/media/tbox2.png?raw=true)
 
  <hr>
   
