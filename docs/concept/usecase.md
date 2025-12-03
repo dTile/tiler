@@ -28,7 +28,7 @@ The map is available at
 [https://gis.data.cnra.ca.gov/](https://gis.data.cnra.ca.gov/datasets/CALFIRE-Forestry::ca-perimeters-cal-fire-nifc-firis-public-view/explore)
 
 A corresponding geoJSON file can be suppoerimposed on a  mapping application
-[firiseaton.geojson](/media/firisEaton.geojson) or [firiseaton]](https://github.com/dTile/tiler/blob/13e832576d668be0ad026e3868f8f1b8a6169311/docs/media/FirisEaton.geojson)
+[firiseaton.geojson](/media/firisEaton.geojson) or [firiseaton](https://github.com/dTile/tiler/blob/13e832576d668be0ad026e3868f8f1b8a6169311/docs/media/FirisEaton.geojson)
 
 
 <h4>Methodology</h4>
