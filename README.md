@@ -19,14 +19,14 @@ A perimeter is defined by adding a perimeter threshold (p) to a decimal tile vec
 
 ###
 ```
-// vanilla JS
+// Intantiate a tile that encloses "Null Island" in granularity level 2
+var tile = DT.find(0,0,2);
+or
 var tile = new DT.Tile(2,50,50);
 or
 var tile = new DT.Tile(25050);
-or
-var tile = DT.find(0,0,2);
 
- // Intantiate a tile that encloses "Null Island" in granularity level 2
+
 tile.p=6; //set the decimal precision of the bounding coordinates to 6;
 
 var tbox = tile.surround(10);
@@ -48,7 +48,7 @@ console.log(tbox.gridJSON);
 
 <br>
 
-[Use Case](https://dtile.github.io/concept/usecase)
+[Use Case](https://dtile.github.io/tiler/concept/usecase)
 
 
 <hr>
