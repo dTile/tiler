@@ -1,10 +1,16 @@
 <h3>Tiler</h3>
 <h4>Adding floating grids and tiles on maps</h4>
-Decimal tiles enable a unified notation system for areas on the surface of the earth instead of an alternative or complementary set of coordinates by using unique numbers, overcoming the cumbersome use of vectors, commas, degrees, minutes, seconds and bearings. Decimal tiles split a navigation map or Meracator projected map into recursive 10 x 10 matrices of polygons. The polygons visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature. Each drill-down level splits a tile from a previous zoom level into 100 new tiles enabling granularity as required by the context. Decimal tiles can be represented by one number instead of a vector by concatenating the drill-down level with row number and column number (padded with zeros). A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
+Decimal tiles enable a unified notation system for areas on the surface of the earth instead of an alternative or complementary set of coordinates by using unique numbers, overcoming the cumbersome use of vectors, commas, degrees, minutes, seconds and bearings. Decimal tiles split a navigation map or Meracator projected map into recursive 10 x 10 matrices of polygons. The polygons visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature. Each drill-down level splits a tile from a previous zoom level into 100 new tiles enabling granularity as required by the context. Decimal tiles can be represented by one number instead of a vector by concatenating the drill-down level with row number and column number (padded with zeros).
 <br>
+<h3>Tile</h3>
 
-<h3>Permiters</h3>
-A perimeter is defined by adding a perimeter threshold (p) to a decimal tile vector or number which represents p adjacent tiles to each direction. This means that the perimeter contains a central tile which is part of a matrix that has (p x 2) + 1 columns and rows. A perimeter is denoted by concatenating a dot and the perimeter threshold to the central tile. The API converts tiles or perimeters to coordinates which can be suppoerimposed on mapping systems or naviagation applications as grids or interactive areas. The API enables generation of geoJSON objects that contain tile coordinates and metadata of the perimeters and the tiles within.
+A "tile" is an object that is constructed by g,x and y parameters. "g" represents the granualrity x the distance in tiles from the anti-meridian to the east and y the distance in tiles from the north pole. The API calculates the tile boundaries with its method "coords" and can "inflate" a tile into a tilebox.
+Granularity level 1 covers a basic Mercator projection layer with 100 tiles or (10 x 10). 
+In granuarity 2 the Base offset contains 100 x 100 tiles and so on.
+The base offset (or 0) is the area confined by [90&deg;,-180&deg;] in the northwest and [-90&deg;.180&deg;] in the southeast. A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
+
+<h3>Tbox - Tile box</h3>
+A tile box represents a rectangular perimeter that contains tiles. It is instantiated by assigning an anchor tile and increments to the east and south. A Tbox is denoted by concatenating a dot and the x and y thresholds. The API can convert a tile to a tilebox by surrounding it and has methods that create the lines or geoJSON string that represent it. Thus the use of a Tbox is effective when suppoerimposin floating grids on mapping systems or naviagation applications.
 <br>
 
 <h3>CDN</h3>
