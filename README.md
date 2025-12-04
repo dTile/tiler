@@ -10,7 +10,7 @@ Decimal tiles are  represented by one number instead of a vector by concatenatin
 A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
 
 <h3>Tbox - Tile box</h3>
-A tile box represents a quadrilateral perimeter that encloses tiles. It is instantiated by assigning an northwestern anchor tile number and increments to the east and south. A Tbox is denoted by concatenating a dot and the xi and yi increment to the anchor number. The API can convert a tile to a tilebox by surrounding it or extending it or using a function that has the coordinates of opposing corners. A Tbox has methods that create the set of coordinates that represent grid lines or geoJSON string that includes the coordinates of its tiles. Thus, the use of a Tbox is effective when suppoerimposing floating grids of different sizes on mapping applications.
+A tile box represents a quadrilateral perimeter that encloses tiles. It is instantiated by assigning an northwestern anchor tile number and increments to the east and south. A Tbox is denoted by concatenating a dot and the xi and yi increment to the anchor number. The API can convert a tile to a tilebox by surrounding it or extending it or using a function that has the coordinates of opposing corners. A Tbox has methods that create the set of coordinates that represent grid lines or geoJSON string that includes the coordinates of its tiles. Thus, the use of a Tbox is effective when suppoerimposing floating grids of different resolution on mapping applications.
 <br>
 
 <h3>CDN</h3>
