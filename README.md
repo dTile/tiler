@@ -21,8 +21,9 @@ A tile box represents a quadrilateral perimeter that encloses tiles. It is insta
 ```
 
 <h3>Node</h3>
-const DT = require('./<YourAPPDirectory>/tiler');
-
+<pre>
+const DT = require('./YourAPPDirectory/tiler');
+</pre>
 
 
 <h3>JS Examples</h3>
