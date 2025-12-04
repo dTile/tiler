@@ -20,7 +20,7 @@ A tile box represents a quadrilateral perimeter that encloses tiles. It is insta
 <script src="https://cdn.jsdelivr.net/gh/dTile/tiler/dist/tiler.js"></script>
 ```
 
-<h3>Node/h3>
+<h3>Node</h3>
 const DT = require('./<YourAPPDirectory>/tiler');
 
 
