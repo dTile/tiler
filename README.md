@@ -1,11 +1,12 @@
 <h3>Tiler</h3>
-<h4>Adding floating grids and tiles on maps</h4>
-Decimal tiles enable a unified shorthanded notation of areas on the surface of the earth instead of an alternative or complementary set of coordinates by using unique numbers, overcoming the cumbersome use of vectors, commas, degrees, minutes, seconds and bearings. Decimal tiles split a navigation map or Meracator projected map into recursive 10 x 10 matrices of quadricular polygons. The tiles visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature. Each drill-down level splits a tile from a previous zoom level into 100 new tiles enabling granularity as required by the context. Decimal tiles can be represented by one number instead of a vector by concatenating the drill-down level with row number and column number (padded with zeros).
+<h4>Enhancing maps with floating grids and tiles</h4>
+Decimal tiles enable a unified shorthanded notation of areas on the surface of the earth instead of an alternative or complementary set of coordinates by using unique numbers, overcoming the cumbersome use of vectors, commas, degrees, minutes, seconds and bearings. Decimal tiles split a navigation map or Meracator projected map into recursive 10 x 10 matrices of quadricular polygons. The tiles visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature. Each granularity level has a nechanism that drills-down the previous level by spliting all tiles from a previous zoom level into 100 new tiles enabling a resolution tha may adapt to a required context. 
 <br>
 <h3>Tile</h3>
 
 A "tile" represents a quadrilatareal that has asimilar functionalilty of a square pixel in HD screens, where the screen is replaced by a map superimposed on a digital canvas. A tile is instantiated by a constructor that takes g,x and y parameters. "g" represents the granualrity, x the distance in tiles from the anti-meridian to the east and y the distance in tiles from the north pole. The API calculates the tile boundaries with its method "coords" and can be "inflated" into a grid of tiles (Tbox).
 At granularity level 1, 100 tiles or (10 x 10) would cover the Mercator projection base layer. In granuarity 2 the Base offset contains 100 x 100 tiles and so on.
+Decimal tiles are  represented by one number instead of a vector by concatenating the drill-down level with row number and column number (padded with zeros).
 A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
 
 <h3>Tbox - Tile box</h3>
@@ -61,10 +62,13 @@ The base offset (or 0) is the area confined by [90&deg;,-180&deg;] in the northw
 
 ![Demo use](https://dtile.github.io/tiler/media/tbox2.png?raw=true)
 
+The antimeridian is the 180° line of longitude. The Aleutian Islands archipelago, which includes Attu Island, crosses this line. 
+Attu Island is located at approximately 172° 55' East longitude. Because it is east of the 180° meridian, it is technically in the Eastern Hemisphere, even though it is part of the United States. The offseting system enables diplaying a contiguous Tbox that is composed by tiles that are located in the western and eastern hemisphere.
+
  <hr>
   
 > [!NOTE]
-> Tiles visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature under the Mercator projection model.
+> Tiles visually seem to form perfect adjacent squares or a grid. The tiles are actually trapezoids that look like squares due to earth curvature under the anomality of the Mercator projection model. The anomality is accentuanted when moving towards the north or south poles.
 
  
 <h3>License</h3>
