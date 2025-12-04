@@ -1,24 +1,31 @@
-(()=>{
+
+((exports)=>{
 var root = {x:0,y:0,g:0};
-const version = "0.0.7";
+const version = "0.0.8";
 
 /**
 * @class Tile
 * Creates a vector normal to Earth’s surface on the Mercator projection model.
 *
 * Constructor 1:
-* @param {number} g - granularity 1 to 9.
-* @param {number} x - units distance from [[90,-180],[-90,-180]] (towards east).
-* @param {number} y - nits from [[90,-180],[90,180]] (towards south).
-* @param {number} p - precision (optional) defines decimal fraction.
+* new Tile(g,x,y,o)
+* g {number 1-9} - granularity or grid resolution - at granularity 1 10 tiles encircle the earth. At g 2 100 tiles encircle the earth and so on.
+* x {Number} - units distance from [[90,-180],[-90,-180]] (towards east).
+* y {Number} - nits from [[90,-180],[90,180]] (towards south)
+* options {offset:Number,p:Number,offset:Number}
+* 	p - precision (optional) defines decimal fraction for coordinates- default 6.
+*   offset - horizontal offset (optional) defines how many multuplies of 360 to latitudes - default 0.
+*   e - elevation start in tiles for cubic representation. (optional)
+*	} optional
 
 * Constructor 2:
-* @param {number} tn - tilenumber.
-* @param {number} p - precision (optional) defines decimal fraction.
+* new Tile(tn,o)
+* tn{Number} - tilenumber.
+* otions as above.
 *
 * @example
-*   const n = new DT.Tile(1,5,5) returns the tile that has its NW corner on [90,-180] on a 10 x 10 matrix;
-*   const n = new DT.Tile(155,6) returns the same tile as above;
+* const n = new DT.Tile(1,5,5) returns the tile that has its NW corner on [0,0] on a 10 x 10 grid.
+* const n = new DT.Tile(25050,{p:6,offset:1) returns the tile that has its NW corner on [0,0] on a 100 x 1=0 grid with longitude incremented by 360°.
 */
 
 class Tile{
@@ -37,7 +44,7 @@ opt={p:6,offset:0}
 
 if(!validTN(n)){
 
-console.log(`invalid tile number (${number})`);
+console.log(`invalid tile number (${Number})`);
 return;
 }else{
 this.valid=true;
@@ -89,28 +96,49 @@ get b(){return this.coords[1]}
 get c(){return this.coords[2]}
 get d(){return this.coords[3]}
 
-/*
-perimeter(xi,yi){
-var x2 = xi;
-x2 = parseInt(x2);
-var y2 = yi;
-y2 = parseInt(y2);
-var newX = this.x-x2;
-if(newX<0){
-newX=0
-}
-x2 = x2+x2;
-var newY = this.y-y2;
-if (newY<0){
-newY=0;
-}
-y2 = y2+y2;
-//tileNumber=DT.encode(tile.g,newX,newY);
-var newTile = encode(this.g,newX,newY)
-var expanded = new DT.Tbox(newTile,x2,y2,this.options);
-return expanded;
-}
+/**
+* @function dist(point):
+* returns distance to a tile in meters.
+*
 */
+
+dist(point){
+var ret;
+try{
+var coords= this.coords;
+	if(inPoly(point,coords)){
+		console.log("Inside tile")
+		return 0
+	}
+let minDistance = Infinity;
+
+    // Iterate through each edge of the square
+    for (let i = 0; i < coords.length; i++) {
+        const p1 = coords[i];
+        const p2 = coords[(i + 1) % coords.length];
+
+        // Calculate distance from point to line segment (p1-p2)
+        const dx = p2[1] - p1[1];
+        const dy = p2[0] - p1[0];
+        const lengthSq = dx * dx + dy * dy;
+
+        let t = 0;
+        if (lengthSq !== 0) {
+            t = ((point[1] - p1[1]) * dx + (point[0] - p1[0]) * dy) / lengthSq;
+            t = Math.max(0, Math.min(1, t)); // Clamp t to [0, 1] for segment
+        }
+
+        const closestLon = p1[1] + t * dx;
+        const closestLat = p1[0] + t * dy;
+        const d = distance(point, [closestLat,closestLon]);
+        ret = minDistance = Math.min(minDistance, d);
+		
+    }
+    }catch(e){console.log(e)}
+
+    return ret;
+}
+
 
 /*****
 * @function expand (xi,yi) : Tbox
@@ -128,7 +156,7 @@ return expanded;
 /*****
 * @function surround(l):Tbox
 * returns a Tbox which surrounds a tile with l tiles on each side
-* l {number} : threshold
+* l {Number} : threshold
 */
 
 surround(l){
@@ -165,9 +193,9 @@ class Tbox{
 * Creates a quadricular that encloses a list of tiles.
 *
 * Constructor 1:
-* tn {number} - number of the top leftmost tile.
-* xi {number} - increment to the east.
-* yi {number} - increment to the south.
+* tn {Number} - number of the top leftmost tile.
+* xi {Number} - increment to the east.
+* yi {Number} - increment to the south.
 * options:{
 * 	p - precision (optional) defines decimal fraction.
 *   offset - horizontal offset (optional) defines how many multuplies of 360 to latitudes.
@@ -176,7 +204,7 @@ class Tbox{
 *	} optional
 *
 * Constructor 2:
-* tn {number} - tilebox number.
+* tn {Number} - tilebox number.
 * options: as constructor 1
 *
 * @example
@@ -529,8 +557,8 @@ return j;
 * @function find(lt,ln,g,p): new Tile
 * Returns a tile that surrounds [lat,lng] point for a grid level.
 *
-* lt: {number} latitude
-* ln: {number} longitude
+* lt: {Number} latitude
+* ln: {Number} longitude
 * g: {1 to 9} granularity
 * p: {5 to 12} decimal presicision
 *
@@ -615,7 +643,7 @@ return ret;
 * y2 (optional) tiles/cubes to the south
 * e (optional) - elevation start for cube
 * e2 elevation increment
-* @returns {number} - a unique identifier that denominates a tile, a cube, a boounding rectangle or a bounding box (bbox)
+* @returns {Number} - a unique identifier that denominates a tile, a cube, a boounding rectangle or a bounding box (bbox)
 * GXXXYYY.X2X2Y2Y2F format:
 *	GXXXYYYE denominates the anchor or single tile/cube
 *   X2X2Y2Y2E2F (optional) denomintaes the hitch increment which points to the farthest tile or cube (farthest corner) from the anchor
@@ -791,8 +819,8 @@ return o;
 /**
 * @function dtXYG(g,x,y,options): returns a vector with tile corners' coords.
 *
-* x {number} - X units distance from [[90,-180],[-90,-180]] (towards east).
-* y {number} - Y units from [[90,-180],[90,180]] (towards south).
+* x {Number} - X units distance from [[90,-180],[-90,-180]] (towards east).
+* y {Number} - Y units from [[90,-180],[90,180]] (towards south).
 * g {1-9} g - granularity.
 * options (optional) = options include precision and offset.
 */
@@ -910,8 +938,8 @@ return ret
 * Returns an array of 100 tile numbers of the next zoom level at x and y.
 *
 * g {1 - 9} - tile granularity.
-* x {number} - tile horizontal position
-* y {number} - tile vart position.
+* x {Number} - tile horizontal position
+* y {Number} - tile vart position.
 */
 
 function split100(g,x,y){
@@ -1144,9 +1172,30 @@ var pow = Math.pow(10, precision === undefined ? 6 : precision);
 return Math.round(num * pow) / pow;
 }
 
+function distance(p1,p2) {
+	var ret;
+	try{
+    const R = 6371e3;
+	var lat1=p1[0], lon1=p1[1], lat2=p2[0], lon2=p2[1];
+    const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	ret = R * c;
+	}catch(e){console.log(e)}
+    return ret
+}
+function unload(){
+	if(DT){DT={};}	
+}
 //helpers end
 
-var exports = {
+var exps = {
 Tile:Tile,
 Tbox:Tbox,
 feature:feature,
@@ -1161,6 +1210,7 @@ lines:lines,
 tileJSON:tileJSON,
 split100:split100,
 nFormat:nFormat,
+distance:distance,
 validTN:validTN,
 validDD:validDD,
 wrapN:wrapN,
@@ -1168,12 +1218,14 @@ offsetter:offsetter,
 inPoly:inPoly,
 flip:flip,
 version:version,
-perimJSON:null,
-perim:null,		
-outline:null,
-outlineJSON:null,
+unload:unload,
 }
 
-window.DT = exports;
-if (typeof module != 'undefined' && module.exports) module.exports = exports; // ≡ export defaults
-})();
+for (const [key, value] of Object.entries(exps)) {
+console.log(`${key}: ${value}`);
+exports[key] = value 
+}
+
+
+//if (typeof module != 'undefined' && module.exports) {module.exports = exports} else{window.DT = exports;}
+})(typeof exports === 'undefined'? window.DT={}: exports);
