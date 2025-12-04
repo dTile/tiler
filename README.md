@@ -4,17 +4,13 @@ Decimal tiles enable a unified shorthanded notation of areas on the surface of t
 <br>
 <h3>Tile</h3>
 
-A "tile" represents a quadrilatareal that has asimilar functionalilty of a square pixel in an HD screen, where the screen is replaced by a map or a digital canvas. A tile is instantiated by a constructor that takes g,x and y parameters. "g" represents the granualrity, x the distance in tiles from the anti-meridian to the east and y the distance in tiles from the north pole. The API calculates the tile boundaries with its method "coords" and can be "inflated" into a tile-box.
+A "tile" represents a quadrilatareal that has asimilar functionalilty of a square pixel in HD screens, where the screen is replaced by a map superimposed on a digital canvas. A tile is instantiated by a constructor that takes g,x and y parameters. "g" represents the granualrity, x the distance in tiles from the anti-meridian to the east and y the distance in tiles from the north pole. The API calculates the tile boundaries with its method "coords" and can be "inflated" into a grid of tiles (Tbox).
 At granularity level 1, 100 tiles or (10 x 10) would cover the Mercator projection base layer. In granuarity 2 the Base offset contains 100 x 100 tiles and so on.
 A tile number shares the digits of its ancestors, which makes zooming and joining or splitting tiles more understandable and easier to program or share.
 
 <h3>Tbox - Tile box</h3>
-A tile box represents a quadrilateral perimeter that contains tiles. It is instantiated by assigning an anchor tile number and increments to the east and south. A Tbox is denoted by concatenating a dot and the xi and yi thresholds. The API can convert a tile to a tilebox by surrounding it or extending it or using a function that has the coordinates of opposing corners. A Tbox has methods that create the set of coordinates that represent grid lines or geoJSON string that includes the coordinates of its tiles. Thus, the use of a Tbox is effective when suppoerimposing floating grids of different sizes on mapping systems or naviagation applications.
+A tile box represents a quadrilateral perimeter that encloses tiles. It is instantiated by assigning an northwestern anchor tile number and increments to the east and south. A Tbox is denoted by concatenating a dot and the xi and yi increment to the anchor number. The API can convert a tile to a tilebox by surrounding it or extending it or using a function that has the coordinates of opposing corners. A Tbox has methods that create the set of coordinates that represent grid lines or geoJSON string that includes the coordinates of its tiles. Thus, the use of a Tbox is effective when suppoerimposing floating grids of different sizes on mapping applications.
 <br>
-
-<h3>Offsets</h3>
-The base offset (or 0) is the area confined by [90&deg;,-180&deg;] in the northwest and [-90&deg;.180&deg;] in the southeast. At offset 1 a tile would increment its longitude by 360deg; and at offset -1 it would dercrease the longitude by 360deg; and so on. This would enable a tile or a Tbox to be displayed west to the meridian or displayed at any selected offset of a Mercator projection layer. The offset attribute enables displaying Tbox grids that intersect with the anti-meridian. An offset attrbite of a Tbox is derived from the offset of its anchor at the northwest which may imply that some of its other tiles may be in another offset.
-
 
 <h3>CDN</h3>
 
@@ -57,6 +53,11 @@ console.log(tbox.gridJSON);
 
 
 <hr>
+
+<h3>Offsets</h3>
+The base offset (or 0) is the area confined by [90&deg;,-180&deg;] in the northwest and [-90&deg;.180&deg;] in the southeast. At offset 1 a tile would increment its longitude by 360&deg; and at offset -1 it would dercrease the longitude by 360&deg; and so on. This would enable a tile or a Tbox to be displayed west to the meridian or displayed at any selected offset of a Mercator projection layer. The offset attribute enables displaying Tbox grids that intersect with the anti-meridian. An offset attrbute of a Tbox is derived from the offset of its anchor at the northwest which may imply that some of its other tiles may be in an adjacent offset.
+
+
 
 ![Demo use](https://dtile.github.io/tiler/media/tbox2.png?raw=true)
 
