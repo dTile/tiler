@@ -50,27 +50,24 @@ A corresponding geoJSON file can be suppoerimposed on a  mapping application
 
 <h3>Solution</h3>
 
-The algorithm uses the tiler API to generate a list of tiles that make up the corresponding perimeters which are exported to a cross platform [geoJSON](https://github.com/dTile/tiler/blob/e6dbb86b990ac5310382bad2dea94e9cb86e8034/docs/media/eatonTiles.json) file.
-
-
-<hr>
-
-
+The algorithm uses the tiler API to generate a list of tiles that make up the corresponding perimeters which are exported to a cross platform [geoJSON output](https://dtile.github.io/tiler/concept/Eaton).
 The file can be superimposed on a map application which may enable a web service that calcuates the distance to an evacuation area or a smoke impact area.
 If a higher resolution is needed the granularity level can be increased. Perimter thresholds, coloring and naming can be increased as well.
 
 
 ![Perimeter](https://dtile.github.io/tiler/media/EatonTiles.png?raw=true)
-<br>
 
-[Eaton Tiles in geoJSON format](https://dtile.github.io/tiler/concept/Eaton)
+
 <hr>
-<BR>
+
+<br>
+<H3>Changing granularity for different applications</H3>
 In another scenario a higher granularity can show the fire bordering tiles which may serve for the purpose of locating access routes, hospitals or assigning resposne teams to specific tiles.
 <BR>
-![Edges](https://dtile.github.io/tiler/media/altadena.png?raw=true)
-<HR>
 
+![Edges](https://dtile.github.io/tiler/media/altadena.png?raw=true)
+<BR>
+<HR>
 
 [Read more on the tiling Concept](https://dtile.github.io/tiler/concept/motivation)
 
