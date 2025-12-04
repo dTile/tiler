@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Decimal Tiles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="author" content="">
+<meta name="keywords" content="Map Tiles">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/tiler/DT/dist/tiler.js"></script>
+<script src="
+https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css
+" rel="stylesheet">
+<style>
+a{cursor: pointer;}
+
+input{
+text-align:center;
+}
+.rel{
+position:relative
+}
+.hidden{
+display:none!important;
+/*visibility:hidden;*/
+}
+.display-none{
+display:none;
+}
+.tinyinput{
+color:blue;
+font-size:12px;
+width:30px;
+}
+.maph{
+height: calc(100% - 100px);
+width: 100%;
+}
+
+.outline-hack{
+outline-offset:-10px;
+}
+
+.sbutton{
+box-sizing:border-box;
+border-radius:2px;
+padding:2px;
+text-align:center;
+text-decoration:none;
+color:darkblue;
+margin:2px;
+cursor:pointer;
+outline:1px solid;
+/*outline-offset:-2px;*/
+display:inline-block;
+}
+.push-right{
+float:right !important;
+}
+.push-left{
+float:left !important;
+}
+.bottom-left{
+position:absolute;
+bottom:3px;
+left:3px;
+z-index:2001;
+}
+.top-left{
+position:absolute;
+top:3px;
+left:3px;
+z-index:2001;
+}
+.top-right{
+position:absolute;
+top:3px;
+right:3px;
+z-index:2001;
+}
+.opacity5{opacity:0.5;}
+.vlabel{
+box-sizing:border-box;
+border-radius:2px;
+text-align:center;
+text-decoration:none;
+outline:1px solid;
+/*outline-offset:2px;*/
+display:inline-block;
+background-color:white;
+cursor:pointer;
+opacity:0.8;
+color:black;
+font-size:12px;
+padding:1px 2px;
+margin:1px;
+font-weight:600;
+opacity:0.95;
+}
+.box{
+display: flex;
+flex-flow: column;
+height: 100%;
+}
+/*
+body {
+height: 100%;
+margin: 0;
+}*/
+.bg{
+border-radius:2px;
+background-color:"white";
+}
+.box .row {
+border: 0px dotted grey;
+}
+.box .row.header {
+flex: 0 1 60px;
+}
+.box .row.content {
+flex: 1 1 auto;
+}
+.box .row.footer {
+flex: 0 1 40px;
+}
+.noscroll{
+overflow-x:hidden!important;scrollbar-width:none!important;
+}
+.xauto{
+padding:0;
+margin:0;
+margin-right:auto!important;
+margin-left:auto!important;
+width:100%;
+text-align:center;
+vertical-align:middle;
+}
+.help-text{
+padding:4px;
+margin:0;
+color:darkgray;
+width:100%;
+text-align:left!important;
+}
+.dflx{
+display:flex;
+justify-content:space-between;
+}
+</style>
+
+</head>
+<body id=dbody class=xauto style="overflow-x:hidden!important;scrollbar-width:none!important;">
+<div class="box xauto noscroll">
+
+<div class="row header xauto">
+<b id=btnTitle>Tile Viewer:&nbsp;</b>
+<button type=button id=btnApplyGeo class=sbutton title="Get tile of geolocation">Here</button>
+<button type=button id=btnExplain class=sbutton title="Get tile of geolocation">Help</button>
+<button type=button id=btnFit class=sbutton>fit</button>
+<button type=button id=btnClear class=sbutton>clear</button>
+<button type=button id=btnTbox title="show tbox options" class=sbutton>Tbox</button>
+<br>
+
+<span>Precision:</span><input class=tinyinput id=precision value=7 type="number" min="6" max="12">&nbsp;
+<span class=tile-mode id=tile-mode>
+<span>Perimeter:</span><input class=tinyinput id=perimeter value=20 type="number" min="1" max="40">&nbsp;
+</span>
+<span id=tbox-mode class="tbox-mode hidden">
+xi:<input title="Increment to east" class=tinyinput id=xi-input value=10 type="number" min="1">&nbsp;
+yi:<input title="Incrment to south" class=tinyinput id=yi-input value=10 type="number" min="1">&nbsp;
+</span>
+</span>
+<br>
+
+<div style="flex-wrap:wrap;display:flex;">
+
+<span style="flex-grow:1;">
+<a id=btnCopyTN title=tile>Tile:</a>
+<input class=tinyinput1 id="m-number" value="25050" placeholder="valid tile number" type="search">
+<button id=btnTileInfo type=button title="Tile Info" class=sbutton>&nbsp;&#x2139;&nbsp;</button>
+<button id=btnApplyNumber type=button class=sbutton title="">Apply</button>
+</span>
+
+<span class="tbox-mode hidden" style="flex-grow:1;">
+<a id=btnCopyTB title=tile>Tbox:</a>
+<input class=tinyinput1 id="tb-number" readonly value="25050.10102" placeholder="valid tbox number" type="search">
+<button id=btnTBoxInfo type=button title="Tilebox Info" class=sbutton>&nbsp;&#x2139;&nbsp;</button>
+<button id=btnApplyTbox type=button class=sbutton title="">Show</button>
+</span>
+
+</div>
+
+<a title="Click to copy coords" id=btnCopyM title=Marker>&#128392;</a><input class=tinyinput1 id="m-coords" value="0,0" type="search">
+<button id=btnGetTile type=button title="Get tile from coord" class=sbutton>Tile</button>
+<button id=btnLabels type=button class=sbutton>Labels</button>
+<span id="curr-zoom"></span>
+
+<br>
+</div>
+
+<div map-area class="row content rel1 xauto">
+<div id=maph class=maph1 style1="width:100%;height:100%; background-color:lightblue;" style="width:100%;height: calc(100vh - 150px); background-color: lightblue;">
+<div id=message-area class="hidden top-right">
+<div id=message-text class="vlabel">
+</div>
+</div>
+
+<div id=range-area class="vlabel top-left" style="top:50px;z-index:1001;padding:2px;">
+<span title = "Granularity level">
+<input class=tinyinput1 id=level readonly value=2 min="2" max="9" style="width:14px;">
+</span><BR>
+<input type="range" title=grid id="gg-o" name="drilldown" value = 2 min="2" max="9" style="writing-mode:vertical-lr;color:purple;" />
+</div>
+
+<div id=help-area class="bottom-left hidden vlabel" style="bottom:50px;z-index:1001;padding:2px;">
+<a id=close-help class="top-right">&#x2716;</a>
+<div id=help-wrap>
+<span id=help-title></span>
+<br>
+<div id=help-text class="help-text">
+
+</div>
+</div>
+</div>
+
+
+<div id=info-area class="hidden bottom-left">
+<div id=info-text class="vlabel">
+</div>
+</div>
+
+
+<div id=explain-area class="top-left vlabel hidden" style="top:50px;left:30px;z-index:1001;padding:2px;">
+<a id=close-explain class="top-right">&#x2716;</a>
+<div id=explain-wrap>
+<span id=explain-title>Help</span>
+<br>
+<div id=explain-text class="help-text" style="width:200px;">
+Click on the map or edit the tile number to view a tile and its boundaries.<br>
+For higher resolution (granularity) move the slider downwards.<br>
+A surrounding tile box will show a context grid that encloses the tile in its center.<br>
+Click on the "labels" button to show the tile numbers in the tile box.<br>
+The purple grid demarks a granularity level 1.
+</div>
+</div>
+</div>
+
+
+</div>
+</div>
+
+<div class="row footer xauto">
+<div id=extras-area class1="top-left">
+<div id=extras class="vlabel1">
+</div>
+</div>
+</div>
+
+
+</div>
+</body>
+</html>
+
+<script>
+
+var mm={};
+
+function init(){
+
+mm.map=L.map('maph',{zoomControl:false,zoomSnap:0.25,zoomDelta:0.25})
+    
+//.setView([51.505, -0.09], 4);
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {clickable:true,crossOrigin:true,maxZoom:23,maxNativeZoom:20,
+attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(mm.map);
+mm.baseLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
+mm.dtLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
+mm.labelLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
+L.control.scale({updateWhenIdle:true,position:"bottomright"}).addTo(mm.map)
+L.control.zoom({
+        position: 'bottomright' // Options: 'topleft', 'topright', 'bottomleft', 'bottomright'
+    }).addTo(mm.map);
+var zoom = localStorage.getItem("zoom")||"4";
+zoom = parseInt(zoom);
+mm.map.setZoom(zoom);
+_('level').value=localStorage.getItem("level")||2;
+_('gg-o').value=mm.g = parseInt(_('level').value);
+mm.popups=[];
+
+initFuncs();
+initEvents();
+
+_('help-area').onclick=(e)=>{e.stopPropagation()}
+_('explain-area').onclick=(e)=>{e.stopPropagation()}
+_('range-area').onclick=(e)=>{e.stopPropagation()}
+
+_('gg-o').onchange=(e)=>{
+//var dd = _('dd-m').value =_('dd-o').value;
+_('level').value=mm.g =parseInt(_('gg-o').value);
+var o = st2point(_('m-coords').value);
+
+if(o){
+mm.loc = o;
+mm.applyCoords(o.lat,o.lng);
+if(mm.mode){mm.tbInfo()}else{mm.clearHelp()};
+mm.fit();
+}
+}
+
+
+var st = localStorage.getItem("lastMarker")||"0.1,0.1";
+_('m-coords').value = st;
+
+var o = st2point(st);
+var lastTile = DT.find(o.lat,o.lng,mm.g);
+if(lastTile){
+_('m-number').value = lastTile.n;
+}
+
+_('btnApplyTbox').onclick = ()=>{
+var xi=_('xi-input').value||10;
+xi = parseInt(xi);
+mm.xi = xi;
+var yi=_('yi-input').value||10;
+yi = parseInt(yi);
+mm.yi = yi;
+mm.applyTbox(mm.xi,mm.yi);
+}
+
+
+mm.map.panTo([o.lat,o.lng]);
+mm.plOpt = {color:"purple",weight:2,opacity:0.6,fillOpacity:0}
+
+var tb 
+
+tb = new DT.Tbox('100',9,9);
+var lines=tb.lines;
+mm.gridlines=L.polyline(lines,mm.plOpt).addTo(mm.baseLayer);
+
+mm.perimeter=parseInt(_('perimeter').value);
+mm.applyCoords(o.lat,o.lng);
+//mm.drawTile();
+//mm.drawSurround();
+}//init end
+
+mm.applyCoords=(lat,lng)=>{
+mm.clearDT();
+var precision=mm.precision;
+
+var latlng=DT.nFormat(lat,precision)+","+DT.nFormat(lng,precision);
+
+mm.marker=L.marker([lat,lng]).addTo(mm.dtLayer);
+_('m-coords').value=latlng;
+localStorage.setItem("lastMarker",latlng);
+mm.tile=DT.find(lat,lng,mm.g);
+_('m-number').value = mm.tile.n;
+var ttp=L.tooltip({
+opacity:0.9,
+offset:[4,4],
+interactive:true,
+bubblingMouseEvents:false,
+className:"sbutton",
+permanent:false,
+direction:"bottom"
+}).setContent(latlng+"<BR>"+mm.tile.n);
+
+mm.marker.bindTooltip(ttp);
+mm.drawTile(true)
+mm.drawSurround()
+	
+}
+function initFuncs(){
+
+
+mm.applyTbox=(xi,yi)=>{
+if(!mm.tile){
+alrt("Anchor tile missing")
+return;
+}
+mm.clearDT();
+
+
+if(mm.tile){
+mm.drawTile(mm.tile.n);
+var tbox = new DT.Tbox(mm.tile.n,xi,yi,mm.tile.options)
+//console.log(tbox);
+_('tb-number').value = tbox.n;
+	
+var lines = tbox.lines;
+var options = objectCopy(mm.plOpt)	
+options.color = "blue";
+options.opacity = 0.7;
+
+//var coords=mm.tile.coords;
+mm.lines=L.polyline(lines,options).addTo(mm.dtLayer);
+mm.tbox = tbox;
+var coords=tbox.coords;
+mm.map.closePopup();
+
+mm.map.fitBounds(coords,{paddng:[0,0]});
+mm.tbInfo()
+}
+}
+
+mm.fit=()=>{
+/*
+if(mm.gridlines){
+	var bounds = mm.gridlines.getBounds();
+	mm.map.fitBounds(bounds,{paddng:[2,2]});
+}*/
+
+if(mm.tbox){
+var coords = mm.tbox.coords;
+coords.forEach(crd=>{crd=DT.offsetter(crd,mm.tbox.offset)
+//console.log(crd[1])
+})
+
+let southWest = L.latLng(coords[3][0],coords[3][1]); // South-West coordinate
+let northEast = L.latLng(coords[1][0],coords[1][1]); // North-East coordinate (which is 170W)
+let bounds = L.latLngBounds(southWest, northEast);
+//console.log(bounds)
+mm.map.fitBounds(bounds,{
+paddingTopLeft: L.point(0, 0),
+paddingBottomRight: L.point(0, 0) 
+})
+}
+}
+
+mm.drawTile=(l,move,opt)=>{
+var tn =_("m-number").value;
+if(mm.tile){
+//if(DT.validTN(tn)){
+var xi=_('xi-input').value||10;
+var yi=_('yi-input').value||10;
+//var tbn = new DT.Tbox(tn,xi,yi)
+var tbn = mm.tile;
+_('tb-number').value = tbn.n;
+var options = objectCopy(mm.plOpt)
+options.color = "green";
+options.fillOpacity = 0.13;
+// mm.tile = new DT.Tile(tn);
+if(!(mm.tile.valid)){
+alrt("Not a valid tile")
+	return
+}
+var coords=mm.tile.coords;
+mm.tilePoly=L.polygon(coords,options).addTo(mm.dtLayer);
+}else{
+alrt("Non valid tile number")
+}
+var mapBounds = mm.map.getBounds();
+var a = mm.tile.a;
+// Check if the coordinate is within the map bounds
+
+mm.showAbcd(mm.tile.coords)
+mm.qInfo(tn);
+if (mapBounds.contains(a)) {
+} else {
+mm.map.panTo(a)
+}
+}
+
+mm.drawSurround=(l,opt)=>{
+var tn =_("m-number").value;
+//if(DT.validTN(tn)){
+if(mm.tile){
+var options = objectCopy(mm.plOpt);
+options.color = "black";
+options.opacity = 0.7;
+//mm.tile = new DT.Tile(tn);
+
+//console.log(mm.tile)
+mm.tbox = mm.tile.surround(mm.perimeter);
+var lines = mm.tbox.lines;
+_('tb-number').value = mm.tbox.n;
+mm.showAnchor();
+mm.lines=L.polyline(lines,options).addTo(mm.dtLayer);
+}else{
+alrt("Non valid tile number")
+}
+}
+
+mm.clearDT=()=>{
+_("extras").innerHTML="";
+mm.clrLabels();
+mm.map.closePopup();
+mm.map.closePopup();
+//$(".leaflet-popup-close-button").click()
+
+if(mm.dtLayer){
+mm.dtLayer.clearLayers();
+}
+}
+mm.clearHelp=()=>{
+$('#help-title').html("");
+$('#help-text').html("");
+$('#help-area').addClass("hidden");
+}
+mm.showAnchor=function(){
+//mm.clearHelp()
+if(mm.anchorIcon){
+mm.dtLayer.removeLayer(mm.anchorIcon)
+}
+if(mm.tbox){
+var mIcon;
+mIcon=L.divIcon({
+className1: 'bg',
+html: '<div style="width:24px;" class="vlabel">' + '&#x2693;' +'</div>',
+iconAnchor: [-2,-2]
+});
+var a = DT.offsetter(mm.tbox.nw,mm.tbox.offset);
+mm.anchorIcon=L.marker(a,{icon:mIcon,title:a}).addTo(mm.dtLayer);
+mm.anchorIcon.on("click",(e)=>{
+	mm.tbInfo()
+})
+}
+}
+
+mm.showAbcd=function(crds){
+var a= crds[0],b= crds[1],c= crds[2],d= crds[3];
+
+var mIcon;
+mIcon=L.divIcon({
+className1: 'bg',
+html: '<div style="width:24px;" class="vlabel">' + "a" +'</div>',
+iconAnchor: [-2,-2]
+});
+mm.mA=L.marker(a,{icon:mIcon,title:a}).addTo(mm.dtLayer);
+
+
+mIcon=L.divIcon({
+className1: 'bg',
+html: '<div style="width:24px;" class="vlabel">' + "b" +'</div>',
+iconAnchor: [28,-2]
+});
+mm.mB=L.marker(b,{icon:mIcon,title:b}).addTo(mm.dtLayer);
+
+
+mIcon=L.divIcon({
+className1: 'vlabel1',
+html: '<div style="width:24px;" class="vlabel">' + "c" +'</div>',
+iconAnchor: [28,26]
+});
+mm.mC=L.marker(c,{icon:mIcon,title:c,className1:"vlabel"}).addTo(mm.dtLayer);
+
+mIcon=L.divIcon({
+className1: 'bg',
+html: '<div style="width:24px;" class="vlabel">' + "d" +'</div>',
+iconAnchor: [-2,26]
+});
+mm.mD=L.marker(d,{icon:mIcon,title:d}).addTo(mm.dtLayer);
+
+
+setTimeout(()=>{
+if(mm.mD){
+		mm.dtLayer.removeLayer(mm.mA);
+		mm.dtLayer.removeLayer(mm.mB);
+		mm.dtLayer.removeLayer(mm.mC);
+		mm.dtLayer.removeLayer(mm.mD);
+}
+},20000)
+
+}
+
+
+mm.tileBtn=function(layer,tile,offset,cb){
+var opt ={offset:offset||0,p:6}
+//debugger;
+//var tile=new DT.Tile(tn,opt);
+if(tile.valid){
+var ofs=tile.offset||0;
+ofs=ofs * 360;
+var pos=tile.c;
+var mIcon=L.divIcon({
+className: 'opacity8 tlbl',
+html: '<div style="width:max-content;max-width:200px;" class="f80 sbutton bg push-right">' + tile.n +'</div>',
+iconAnchor: [12,24]
+});
+//var se = tile.c;
+
+//if(tile.offset){console.log(tile.offset + " " + pos);}
+var m=L.marker(pos,{icon:mIcon}).addTo(layer)
+var tn = m.dt=tile.n;
+m.on("click",(e)=>{
+alrt(tn);
+mm.qInfo(tn);
+})
+return m;
+}
+}
+
+mm.clrLabels=()=>{
+mm.labelsOn=0;
+mm.labelLayer.clearLayers();	
+}
+
+
+mm.labelTiles=function(tbox,cb){
+mm.clrLabels();
+if(tbox){
+/*
+var tiles=tbox.list;
+mm.labelsOn=1;
+tiles.forEach((dt)=>{
+mm.tileBtn(mm.labelLayer,dt,cb);
+})*/
+var tiles=tbox.tiles;
+mm.labelsOn=1;
+tiles.forEach((dt)=>{
+mm.tileBtn(mm.labelLayer,dt,cb);
+})
+}
+}
+
+
+mm.tbInfo=()=>{
+//var tb=new DT.Tbox(tbn);
+var tb=mm.tbox;
+var coords = tb.coords;
+//var pos = tb.centerCoords;
+//debugger;
+//var pos=mm.map.getCenter();
+//mm.map.closePopup();
+mm.tbInfoDet=(tb)=>{
+var det = ""
+det += '<div style = "padding:4px;">';
+det += "Tbox: "
+det+='<a onclick=copyText("'+ tb.n +'")>'+tb.n+'</a>';
+det += "<hr>";
+det += "xi: ";
+det += tb.xi;
+det += "  yi: ";
+det += tb.yi;
+det += "  g: ";
+det += tb.g;
+det += "  offset: ";
+det += tb.offset;
+det += "<br>";
+det += "<br>";
+
+det+="<div class=dflx>";
+det+='<span><a">Anchor / NW tile:</a></span>';
+det+="<span>";
+det+='<a onclick=mm.qInfo("'+ tb.at +'")>'+tb.at+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a">NE tile:</a></span>';
+det+="<span>";
+det+='<a onclick=mm.qInfo("'+ tb.bt +'")>'+tb.bt+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a">SE tile:</a></span>';
+det+="<span>";
+det+='<a onclick=mm.qInfo("'+ tb.ct +'")>'+tb.ct+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a">SW tile:</a></span>';
+det+="<span>";
+det+='<a onclick=mm.qInfo("'+ tb.dt +'")>'+tb.dt+'</a>';
+det+="</span>";
+det+="</div>";
+det+="<hr>";
+
+
+det+="<div class=dflx>";
+det+='<span><a">NW corner:</a></span>';
+det+="<span>";
+det+='<a onclick=cpy()>'+tb.nw+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a">NE corner:</a></span>';
+det+="<span>";
+det+='<a onclick=cpy()>'+tb.ne+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a">SE corner:</a></span>';
+det+="<span>";
+det+='<a onclick=cpy()>'+tb.se+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a">SW corner:</a></span>';
+det+="<span>";
+det+='<a onclick=cpy()>'+tb.sw+'</a>';
+det+="</span>";
+det+="</div>";
+det+="<hr>";
+
+det+="<span>";
+det+='<a class=sbutton onclick=tbJSON("'+ tb.n +'")>'+'geoJSON'+'</a>';
+det+='<a class=sbutton onclick=tbJSON("'+ tb.n +'",1)>'+'Styled geoJSON'+'</a>';
+det+="</span>";
+det+='</div>';
+return det;
+}
+
+
+var det = mm.tbInfoDet(tb)
+/*
+var pos = tb.nw;
+pos = DT.offsetter(pos,tb.offset);
+mIcon=L.divIcon({
+className1: 'bg',
+html: '' + "TBox" +'',
+        iconSize: [25, 41], // Size of your icon
+        iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
+        popupAnchor: [0, -41] // Point from which the popup should open, relative to the iconAnchor
+});
+mm.tbAnchor=L.marker(pos,{icon:mIcon,title:"Tile box anchor"}).addTo(mm.dtLayer);
+mm.tbAnchor.bindPopup(det).openPopup();
+*/
+$('#help-area').removeClass("hidden");
+_('help-title').innerHTML = "Tile box info";
+_('help-text').innerHTML = det;
+}
+
+mm.qInfo=(tl)=>{
+var options = mm.tile.options;
+var q=new DT.Tile(tl,options);
+var det=mm.qInfoDet(q);
+
+var pos=q.a;
+//mm.map.closePopup();
+//if(!map.popupPlace){map.popupPlace=map.getCenter();}
+var popup = L.popup({ autoClose:false,closeOnClick:false,autoPanPadding:[20,20],offset:[10,10]});
+
+popup.setLatLng(pos)
+popup.setContent(det)
+popup.openOn(mm.map)
+mm.popups.push(popup);
+}
+
+
+mm.qInfoDet=(q)=>{
+let precision=parseInt(_("precision").value);
+var tn = q.n;
+var coords=q.coords;
+var corners="[[" + q.a + "],[" + q.b + "],[" + q.c + "],[" + q.d+"]]";
+var width = getWidth(q.coords);
+if(width > 1000){
+width=width / 1000
+var miles=DT.nFormat(width  /  1.609343502101154,2)
+width=width + " km / "
+width+=miles + " miles"
+}else{
+width=width + " meters"
+}
+var name=q.name;
+if(q.number){
+name=q.number;
+}
+var det=""
+det+='<div class=outline-hack1 style1="display:inline-block;margin:-24px;padding:-4px!important;">';
+det+="<b>Tile Info: </b>";
+det+='<a class="sbutton1" title="Copy tile number" onclick=copyText('+tn+')>'+tn+'</a>';
+
+det+="<hr>";
+det+="x:" + q.x + " y:" + q.y + " g:" + q.g + " offset:" + mm.tile.offset;
+det+="<br>";
+det+="<div class=dflx>";
+det+='<span><a class1="sbutton">a NW:</a></span>';
+det+="<span>";
+det+='<a class1="sbutton" title="Copy NW corner" onclick=cpy()>'+q.a+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a class1="sbutton">b NE:</a></span>';
+det+="<span>";
+det+='<a class1="sbutton" title="Copy NE corner" onclick=copyText("'+ q.b +'")>'+q.b+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a class1="sbutton">c SE</a></span>';
+det+="<span>";
+det+='<a class1="sbutton" title="Copy SE corner" onclick=copyText("'+ q.c +'")>'+q.c+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a class1="sbutton">d SW</a></span>';
+det+="<span>";
+det+='<a class1="sbutton" title="Copy SW corner" onclick=copyText("'+ q.d +'")>'+q.d+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<div class=dflx>";
+det+='<span><a class1="sbutton">Center</a></span>';
+det+="<span>";
+det+='<a class1="sbutton" title="Copy SW corner" onclick=copyText("'+ q.center +'")>'+q.center+'</a>';
+det+="</span>";
+det+="</div>";
+
+det+="<hr>";
+det+="Width: ~" + width;
+det+="<br>";
+det+='<a class="sbutton" title="Copy corners array" onclick=copyText("'+ corners +'")>Copy coords:</a>';
+det+='<a class="sbutton" title="Download geoJSON" onclick=getJSON('+tn+')>'+"&dArr;"+' geoJSON</a>';
+det+='<a class="sbutton" title="Geo Location distance to tile" onclick=myDistance('+tn+',this)>'+""+' Distance</a>';
+
+
+
+
+//det+="<br>"
+det+="</div>"
+return det
+}//qInfo
+
+
+}//initFuncs
+
+function initEvents(){
+
+mm.map.on("moveend",(e)=>{
+var currZoom=mm.map.getZoom();
+mapinfo("Zoom: "+ currZoom);
+localStorage.setItem("zoom",''+currZoom)
+})
+
+
+mm.map.on("click",(e)=>{
+var lat=e.latlng.lat;
+var lng=e.latlng.lng;
+if(lat>85){lat=85};
+if(lat<-85){lat=-85};
+mm.applyCoords(lat,lng);
+if(mm.mode){mm.tbInfo()}else{mm.clearHelp()};
+})
+
+_('close-help').onclick=()=>{
+_('help-area').classList.add('hidden');
+}
+_('close-explain').onclick=()=>{
+_('explain-area').classList.add('hidden');
+}
+
+_("btnTitle").onclick=()=>{
+localStorage.removeItem("lastMarker");
+localStorage.removeItem("level");
+localStorage.removeItem("zoom");
+window.location.reload();
+}
+
+
+_("btnTbox").onclick=()=>{
+if(mm.mode==1){
+mm.mode=0;
+$('.tbox-mode').addClass("hidden");
+$('.tile-mode').removeClass("hidden");
+}else{
+mm.mode=1;
+$('.tbox-mode').removeClass("hidden");
+mm.tbInfo();
+
+}
+}
+
+
+_("btnGetTile").onclick=()=>{
+var o = st2point(_('m-coords').value);
+mm.loc = o;
+mm.applyCoords(o.lat,o.lng)
+}
+
+_("btnLabels").onclick=()=>{
+
+if(mm.tbox){
+
+if(mm.labelsOn){
+mm.clrLabels()
+}else{
+mm.labelTiles(mm.tbox);
+}
+}
+}
+
+_("btnApplyGeo").onclick=()=>{
+//alrt('locating');
+mm.clearDT();
+var cb = function(obj){
+var lat = DT.nFormat(obj.lat);
+var lng = DT.nFormat(obj.lng);
+var latlng = lat + "," + lng;
+localStorage.setItem("lastMarker",latlng);
+_('m-coords').value = latlng;
+var tile=DT.find(lat,lng,mm.g);
+if(tile){
+mm.tile=tile;
+_('m-number').value = mm.tile.n;
+mm.drawTile();
+mm.drawSurround();
+}
+//console.log(obj)
+}
+locate(cb);
+}
+
+_("level").onchange=(e)=>{
+mm.g = parseInt(_("level").value);
+localStorage.setItem("level",''+mm.g)
+}
+
+_("m-number").onchange=(e)=>{
+}
+
+_("perimeter").onchange=(e)=>{mm.perimeter = parseInt(_("perimeter").value)||1}
+
+_("btnApplyNumber").onclick=()=>{
+
+mm.clearDT();
+//let perimeter=parseInt(_("perimeter").value);
+mm.drawTile();
+mm.drawSurround();
+}
+
+_('btnTBoxInfo').onclick=()=>{
+mm.tbInfo(_('tb-number').value);
+}
+
+_('btnTileInfo').onclick=()=>{
+mm.qInfo(_('m-number').value);
+}
+
+_('btnCopyTN').onclick=()=>{copyText(_('m-number'))}
+_('btnCopyTB').onclick=()=>{copyText(_('tb-number'))}
+_('btnCopyM').onclick=()=>{copyText(_('m-coords'))}
+_('btnFit').onclick=()=>{
+mm.fit();
+}
+
+_('btnExplain').onclick=()=>{
+$('#explain-area').removeClass('hidden');
+}
+
+_('btnClear').onclick=()=>{
+mm.popups.forEach(popup=>popup.remove());
+mm.popups=[];
+mm.clearDT()
+}
+
+}//initEvents
+
+//***** helpers start
+
+function st2point(st){
+var o
+var arr=st.trim().split(',');
+if(arr.length>1){
+var lat=Number(arr[0]);
+var lng=Number(arr[1]);
+lat = DT.wrapN(lat,-90,90);
+lng = DT.wrapN(lng,-180,180);
+//if(lat>=-90&&lat<=90&&lng>=-180&&lng>=-180){
+o={lat:lat,lng:lng}
+//}
+}
+return o
+}
+
+function p2tile(l){
+var r=l+"";
+var pair=r.split(".");
+if(pair[0]){
+r=pair[0];
+}
+return r
+}
+
+function displayOn(l){
+var el = _(l);if(el){el.classList.remove('hidden')}
+}
+
+function displayOff(l){
+var el = _(l);
+if(el){el.classList.add('hidden')}
+}
+
+function p2perim(l){
+var r=l+"";
+var ret;
+var pair=r.split(".");
+if(pair.length>1){
+ret=Number(pair[1]);
+}
+return ret
+}
+
+function _(d){return document.getElementById(d)}
+
+function myDistance(tn,el){
+var tile = new DT.Tile(tn);
+
+var cb = function(obj){
+var lat = DT.nFormat(obj.lat);
+var lng = DT.nFormat(obj.lng);
+var point = [lat,lng]
+var dist=tile.dist(point);
+
+if(dist==0){
+dist = "Inside Tile"
+}else{
+dist = DT.nFormat((dist / 1000),2)
+dist = dist + " km";
+}
+
+alrt(dist);
+if(el){ el.innerHTML = dist }
+}
+
+locate(cb);
+
+
+
+
+}
+
+function getJSON(tl){
+//var q=new DT.Tile(tl)
+var dname;
+dname=tl +".json"
+j=DT.tileJSON(tl,6,1);
+
+let a=document.createElement("a")
+a.download=dname;
+j=new Blob([j], {type: "text/plain"});
+a.href=URL.createObjectURL(j);
+a.click();
+}
+
+function tbJSON(tb,nice){
+var dname;
+dname=tb.replace(".","_") +".json"
+var tbox = new DT.Tbox(tb);
+if(nice){
+j = tbox.niceGridJSON;
+}else{
+j = tbox.gridJSON;
+}
+let a=document.createElement("a")
+a.download=dname;
+j=new Blob([j], {type: "text/plain"});
+a.href=URL.createObjectURL(j);
+a.click();
+}
+
+function outlineJSON(tl){
+var q=DT.decode(tl)
+var dname;
+if(q.p){
+j=DT.outlineJSON(p2tile(tl),q.p);
+dname=(""+tl).replace(".","_")  + "_outline"  + ".json"
+let a=document.createElement("a")
+a.download=dname;
+j=new Blob([j], {type: "text/plain"});
+a.href=URL.createObjectURL(j);
+a.click();
+}
+}
+
+function alrt(text){
+console.log(text);
+_('message-text').innerHTML=text;
+_('message-area').classList.remove('hidden');
+setTimeout(()=>{
+_('message-text').innerHTML="";
+_('message-area').classList.add('hidden');
+},10000);
+}
+
+function mapinfo(text){
+_('info-text').innerHTML=text;
+_('info-area').classList.remove('hidden');
+setTimeout(()=>{
+_('info-text').innerHTML="";
+_('info-area').classList.add('hidden');
+},6000);
+}
+
+function copyText(txt){
+if(DT.validDD(txt)){
+//console.log("dd")
+}
+var text = txt;
+if(txt instanceof HTMLElement){
+text = txt.value;
+}
+navigator.clipboard.writeText(text)
+.then(() => {
+console.log(text);
+alrt(text+"<br>copied!")
+})
+.catch(err => {
+console.error("Failed to copy text: ", err);
+});
+}
+
+function cpy(){
+var t=event.target.innerHTML;
+if(t){copyText(t)};
+}
+
+function locate(cb){
+if (navigator.geolocation) {
+navigator.geolocation.getCurrentPosition((position)=>{showPosition(position,cb)}, showError);
+} else {
+alrt("Geolocation is not supported by this browser.");
+}
+}
+function showPosition(position,cb) {
+const lat = position.coords.latitude;
+const lng = position.coords.longitude;
+if(cb){
+cb({lat:lat,lng:lng})
+}else{
+console.log(`Latitude: ${lat}, Longitude: ${llng}`);  
+}
+}
+function showError(error) {
+switch (error.code) {
+case error.PERMISSION_DENIED:
+alrt("User denied the request for Geolocation.");
+break;
+case error.POSITION_UNAVAILABLE:
+alrt("Location information is unavailable.");
+break;
+case error.TIMEOUT:
+alrt("The request to get user location timed out.");
+break;
+case error.UNKNOWN_ERROR:
+alrt("An unknown error occurred.");
+break;
+}
+}
+
+function getWidth(coords){
+var width;
+var sLatSW=DT.nFormat(coords[0][0]);
+var sLngSW=DT.nFormat(coords[0][1]);
+var sLatNE=DT.nFormat(coords[2][0]);
+var sLngNE=DT.nFormat(coords[2][1]);
+var nw=DT.nFormat(coords[1][0])+","+DT.nFormat(coords[1][1]);
+//var corners="[[" + q.sw + "],[" + q.nw + "],[" + q.ne + "],[" + q.se+"]]";
+var bounds=[[sLatNE,sLngNE],[sLatSW,sLngSW]]
+var rect=[[sLatNE,sLngNE],[sLatSW,sLngNE],[sLatSW,sLngSW],[sLatNE,sLngSW]];
+var center=L.latLngBounds(rect).getCenter();
+center.lat=DT.nFormat(center.lat);
+center.lng=DT.nFormat(center.lng);
+const rectangleBounds=L.latLngBounds(rect)
+const centerLat=rectangleBounds.getCenter().lat;
+const eastPoint=L.latLng(centerLat, rectangleBounds.getEast());
+const westPoint=L.latLng(centerLat, rectangleBounds.getWest());
+width=eastPoint.distanceTo(westPoint)
+width=parseInt(width);
+return width;
+}
+
+function objectCopy(o){
+var r={};
+try{
+r=JSON.stringify(o)
+r=JSON.parse(r);
+}
+catch(e){};
+return r;
+}
+//***** helpers end
+
+init();
+alrt('Click on a map to show a tile');
+</script>
