@@ -1222,7 +1222,6 @@ unload:unload,
 }
 
 for (const [key, value] of Object.entries(exps)) {
-console.log(`${key}: ${value}`);
 exports[key] = value 
 }
 
