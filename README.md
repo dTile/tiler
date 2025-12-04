@@ -41,10 +41,16 @@ console.log(tile.coords);
 var tbox = tile.surround(10);
 console.log(tbox.coords);
 
-//Output a geoJSON string with all tbox tiles
-console.log(tbox.gridJSON);
+//Output a geoJSON string with the coordinates of 200 tiles that are adjacent to the equator at granularity 2
+var geoJSON2 = new DT.Tbox(20049,99,1).gridSON
+
+//Output a geoJSON string with 100 tiles that cover the earth at granularity 1 (base offset)
+var geoJSON = new DT.Tbox(100,9,9).gridSON
 ```
+![Demo use](https://dtile.github.io/tiler/media/grid1.png?s=200)
+
 <br>
+
 
 [View a tile or a tilebox on a map](https://dtile.github.io/tiler/test/)
 
@@ -56,7 +62,7 @@ console.log(tbox.gridJSON);
 <hr>
 
 <h3>Offsets</h3>
-The base offset (or 0) is the area confined by [90&deg;,-180&deg;] in the northwest and [-90&deg;.180&deg;] in the southeast. At offset 1 a tile would increment its longitude by 360&deg; and at offset -1 it would dercrease the longitude by 360&deg; and so on. This would enable a tile or a Tbox to be displayed west to the meridian or displayed at any selected offset of a Mercator projection layer. The offset attribute enables displaying Tbox grids that intersect with the anti-meridian. An offset attrbute of a Tbox is derived from the offset of its anchor at the northwest which may imply that some of its other tiles may be in an adjacent offset.
+The base offset (or "offset 0") is the area confined by [90&deg;,-180&deg;] in the northwest and [-90&deg;.180&deg;] in the southeast. At offset 1 a tile would increment its longitude by 360&deg; and at offset -1 it would dercrease the longitude by 360&deg; and so on. This would enable a tile or a Tbox to be displayed west to the meridian or displayed at any selected offset of a Mercator projection layer. The offset attribute enables displaying Tbox grids that intersect with the anti-meridian. An offset attrbute of a Tbox is derived from the offset of its anchor at the northwest which may imply that some of its other tiles may be in an adjacent offset.
 
 
 
