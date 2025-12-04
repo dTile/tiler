@@ -8,10 +8,13 @@
 <meta name="description" content="Shared over Making files smarter">
 <meta name="keywords" content="Map Tiles">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/dTile/tiler/dist/tiler.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css" rel="stylesheet">
-<!--link rel="icon" href="favicon.ico" /-->
+<script src="https://cdn.jsdelivr.net/gh/tiler/DT/dist/tiler.js"></script>
+<script src="
+https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css
+" rel="stylesheet">
 <style>
 a{cursor: pointer;}
 
@@ -384,7 +387,7 @@ mm.clearDT();
 if(mm.tile){
 mm.drawTile(mm.tile.n);
 var tbox = new DT.Tbox(mm.tile.n,xi,yi,mm.tile.options)
-console.log(tbox);
+//console.log(tbox);
 _('tb-number').value = tbox.n;
 	
 var lines = tbox.lines;
@@ -410,29 +413,21 @@ if(mm.gridlines){
 	mm.map.fitBounds(bounds,{paddng:[2,2]});
 }*/
 
-
 if(mm.tbox){
 var coords = mm.tbox.coords;
 coords.forEach(crd=>{crd=DT.offsetter(crd,mm.tbox.offset)
-console.log(crd[1])
+//console.log(crd[1])
 })
-
 
 let southWest = L.latLng(coords[3][0],coords[3][1]); // South-West coordinate
 let northEast = L.latLng(coords[1][0],coords[1][1]); // North-East coordinate (which is 170W)
-
-    // Adjust the North-East longitude to represent the continuous path
-    // by adding 360 degrees if it's less than the South-West longitude
-    //if (northEast.lng < southWest.lng) {        northEast.lng += 360;    }
 let bounds = L.latLngBounds(southWest, northEast);
-console.log(bounds)
+//console.log(bounds)
 mm.map.fitBounds(bounds,{
 paddingTopLeft: L.point(0, 0),
 paddingBottomRight: L.point(0, 0) 
 })
 }
-
-
 }
 
 mm.drawTile=(l,move,opt)=>{
@@ -561,20 +556,18 @@ mm.mD=L.marker(d,{icon:mIcon,title:d}).addTo(mm.dtLayer);
 
 
 setTimeout(()=>{
-	if(mm.mD){
+if(mm.mD){
 		mm.dtLayer.removeLayer(mm.mA);
 		mm.dtLayer.removeLayer(mm.mB);
 		mm.dtLayer.removeLayer(mm.mC);
 		mm.dtLayer.removeLayer(mm.mD);
-	}
+}
 },20000)
 
 }
 
 
-
 mm.tileBtn=function(layer,tile,offset,cb){
-
 var opt ={offset:offset||0,p:6}
 //debugger;
 //var tile=new DT.Tile(tn,opt);
@@ -817,8 +810,9 @@ det+="</div>";
 det+="<hr>";
 det+="Width: ~" + width;
 det+="<br>";
-det+='<a class="sbutton" title="Copy corners array" onclick=copyText("'+ corners +'")>Corners (clockwise):</a>';
+det+='<a class="sbutton" title="Copy corners array" onclick=copyText("'+ corners +'")>Copy coords:</a>';
 det+='<a class="sbutton" title="Download geoJSON" onclick=getJSON('+tn+')>'+"&dArr;"+' geoJSON</a>';
+det+='<a class="sbutton" title="Geo Location distance to tile" onclick=myDistance('+tn+',this)>'+""+' Distance</a>';
 
 
 
@@ -1009,6 +1003,33 @@ return ret
 
 function _(d){return document.getElementById(d)}
 
+function myDistance(tn,el){
+var tile = new DT.Tile(tn);
+
+var cb = function(obj){
+var lat = DT.nFormat(obj.lat);
+var lng = DT.nFormat(obj.lng);
+var point = [lat,lng]
+var dist=tile.dist(point);
+
+if(dist==0){
+dist = "Inside Tile"
+}else{
+dist = DT.nFormat((dist / 1000),2)
+dist = dist + " km";
+}
+
+alrt(dist);
+if(el){ el.innerHTML = dist }
+}
+
+locate(cb);
+
+
+
+
+}
+
 function getJSON(tl){
 //var q=new DT.Tile(tl)
 var dname;
@@ -1073,7 +1094,7 @@ _('info-area').classList.add('hidden');
 
 function copyText(txt){
 if(DT.validDD(txt)){
-console.log("dd")
+//console.log("dd")
 }
 var text = txt;
 if(txt instanceof HTMLElement){
