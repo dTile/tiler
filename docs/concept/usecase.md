@@ -63,7 +63,7 @@ If a higher resolution is needed the granularity level can be increased. Perimte
 ![Perimeter](https://dtile.github.io/tiler/media/EatonTiles.png?raw=true)
 <br>
 
-![Eaton Tiles in geoJSON format](https://dtile.github.io/tiler/concept/Eaton.md)
+[Eaton Tiles in geoJSON format](https://dtile.github.io/tiler/concept/Eaton)
 <hr>
 <BR>
 In another scenario a higher granularity can show the fire bordering tiles which may serve for the purpose of locating access routes, hospitals or assigning resposne teams to specific tiles.
