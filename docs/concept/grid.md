@@ -40,3 +40,6 @@ y the distance from latitude 90&deg;;
     "d": (...)
 }
 </pre>
+
+[Tiles in Granularity 6](https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png)
+
