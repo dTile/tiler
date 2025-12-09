@@ -1,5 +1,5 @@
 <h3>Tiler</h3>
-<h4>Granualarity Overview</h4>
+<h4>Granularity Overview - "G" refers to the resoluiton level of a tile or a tile-box</h4>
 
 
 | G | # Tiles <BR>covering earth | Breakdown | ~Width at<BR>the equator | Info |Anchor Tile<BR>Northwest|Hitch<BR>Southeast|Eiffel's Tile 48.858255,2.294491
