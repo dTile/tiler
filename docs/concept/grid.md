@@ -2,7 +2,7 @@
 <h4>Granualarity Overview</h4>
 
 
-| Granualrity | # Tiles <BR>covering earth | Breakdown | ~Width at<BR>the equator | Info |Anchor Tile<BR>Northwest|Hitch<BR>Southeast|Eiffel 48.858255,2.294491
+| G | # Tiles <BR>covering earth | Breakdown | ~Width at<BR>the equator | Info |Anchor Tile<BR>Northwest|Hitch<BR>Southeast|Eiffel's Tile 48.858255,2.294491
 |-------------|-------|-----------|----------------------|------|-|-|-|
 | 1           | 100   | 10 x 10     |         4000 km       | Base |100|199|153|
 | 2   | 10000     | 100 x 100     | 400 km | Encloses most countries |20000|29999|25034|
@@ -10,7 +10,7 @@
 | 4   | 100000000     | 10000 x 10000     | 4 km |  |400000000|499999999|450633440|
 | 5   | 10000000000     | 100000 x 10000     | 400 m |  |50000000000|599999999999|55063734402|
 | 6   | 1000000000000     | 1000000 x 1000000     | 40 m |  |6000000000000|6999999999999|6506373344021|
-| 7   | 1000000000000     | 10000000 x 1-000000     | 4 m |  |70000000000000|799999999999999|750637363440213|
+| 7   | 1000000000000     | 10000000 x 10000000     | 4 m |  |70000000000000|799999999999999|750637363440213|
 
 To find a tile for a latitude and longitude implement DT.find(lat,lng,g);
 <pre>
