@@ -1,1 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Decimal Tiles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="author" content="">
+<meta name="description" content="Shared over Making files smarter">
+<meta name="keywords" content="Map Tiles">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/dTile/DT/dist/dt.js"></script>
+<script src="
+https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css
+" rel="stylesheet">
+<link rel="icon" href="favicon.ico" />
+<style>
+input {
+  text-align: center;
+}
+.rel{
+position:relative
+}
+.hidden{
+visibility:hidden;
+}
+.tinyinput{
+color:blue;
+font-size:12px;
+width:30px;
+}
+.maph{
+height: calc(100% - 100px);
+width: 100%;
+}
+.sbutton{
+box-sizing:border-box;
+border-radius:2px;
+padding:2px;
+text-align:center;
+text-decoration:none;
+color:darkblue;
+margin:2px;
+cursor:pointer;
+outline:1px solid;
+outline-offset:-2px;
+display:inline-block;
+}
+.push-right{
+float:right !important;
+}
+.push-left{
+float:left !important;
+}
+.bottom-left{
+position:absolute;
+bottom:3px;
+left:3px;
+z-index:2001;
+}
+.top-left{
+position:absolute;
+top:3px;
+left:3px;
+z-index:2001;
+}
+.top-right{
+position:absolute;
+top:3px;
+right:3px;
+z-index:2001;
+}
+.opacity5{opacity:0.5;}
+.vlabel{
+box-sizing:border-box;
+border-radius:2px;
+text-align:center;
+text-decoration:none;
+margin:2px;
+outline:1px solid;
+outline-offset:-2px;
+display:inline-block;
+background-color:white;
+cursor:pointer;
+opacity:0.8;
+color:black;
+font-size:12px;
+padding:1px 2px;
+margin:1px;
+font-weight:600;
+opacity:0.95;
+}
+.box{
+display: flex;
+flex-flow: column;
+height: 100%;
+}
+/*
+body {
+height: 100%;
+margin: 0;
+}*/
+.box .row {
+border: 0px dotted grey;
+}
+.box .row.header {
+flex: 0 1 60px;
+}
+.box .row.content {
+flex: 1 1 auto;
+}
+.box .row.footer {
+flex: 0 1 40px;
+}
+.noscroll{
+overflow-x:hidden!important;scrollbar-width:none!important;
+}
+.xauto{
+padding:0;
+margin:0;
+margin-right:auto!important;
+margin-left:auto!important;
+width:100%;
+text-align:center;
+vertical-align:middle;
+}
+</style>
 
+</head>
+<body id=dbody class=xauto style="overflow-x:hidden!important;scrollbar-width:none!important;">
+</body>
+</html>
