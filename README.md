@@ -64,6 +64,11 @@ var geoJSON = new DT.Tbox(100,9,9).gridSON
 [Use Case](https://dtile.github.io/tiler/concept/usecase)
 
 
+<br>
+
+[Granularity Breakdown](https://dtile.github.io/tiler/concept/grid)
+
+
 <hr>
 
 <h3>Offsets</h3>
