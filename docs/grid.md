@@ -1,5 +1,7 @@
-<h3>Tiler</h3>
-<h4>Granularity Overview - "G" refers to the resoluiton level of a tile or a tile-box</h4>
+<h3>Tiler </h3>
+<h4>Granularity Overview</h4>
+<h5>"G" refers to granularity or grid density level of a tile or a tile-box</h5>
+
 
 
 | G | # Tiles <BR>covering earth | Breakdown | ~Width at<BR>the equator | Info |Anchor Tile<BR>Northwest|Hitch<BR>Southeast|Eiffel's Tile 48.858255,2.294491
@@ -41,7 +43,7 @@ y the distance from latitude 90&deg;;
 }
 </pre>
 
-<img src = https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png>
+<img src = "https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png" style="width:80%;">
 
 ![Tiles in Granularity 6](https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png?raw=)
 
