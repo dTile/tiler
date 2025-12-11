@@ -57,7 +57,7 @@ var geoJSON = new DT.Tbox(100,9,9).gridSON
 <br>
 
 
-[View a tile or a tilebox on a map](https://dtile.github.io/tiler/test/)
+[Tile and tilebox test](https://dtile.github.io/tiler/test/)
 
 <br>
 
