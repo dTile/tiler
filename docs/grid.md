@@ -43,5 +43,5 @@ y the distance from latitude 90&deg;;
 
 <img src = https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png>
 
-[Tiles in Granularity 6](https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png)
+![Tiles in Granularity 6](https://raw.githubusercontent.com/DTile/tiler/main/docs/media/paris.png?raw=)
 
