@@ -4,11 +4,11 @@
 <title>Decimal Tiles</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta charset="utf-8">
-<meta name="author" content="">
-<meta name="description" content="Shared over Making files smarter">
+<meta name="author" content="v009">
 <meta name="keywords" content="Map Tiles">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/dTile/tiler/dist/tiler.js"></script>
+<!--script src="https://cdn.jsdelivr.net/gh/dTile/tiler/dist/tiler.js"></script-->
+<script src="../../dist/tiler.js"></script>
 <script src="
 https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js
 "></script>
@@ -41,11 +41,25 @@ height: calc(100% - 100px);
 width: 100%;
 }
 
+.red{
+color:red!important;
+}
+.blue{
+color:blue!important;
+}
+.green{
+color:green!important;
+}
+.orange{
+color:orange!important;
+}
+
 .outline-hack{
 outline-offset:-10px;
 }
 
-.sbutton{
+.sbutton,.mlbl,.vlabel{
+cursor:pointer;
 box-sizing:border-box;
 border-radius:2px;
 padding:2px;
@@ -54,10 +68,79 @@ text-decoration:none;
 color:darkblue;
 margin:2px;
 cursor:pointer;
+font-size:12px;
 outline:1px solid;
 /*outline-offset:-2px;*/
 display:inline-block;
+background-color: #fff;
+
 }
+
+.sbutton{
+font-size:13px;
+padding:1px;
+font-weight:700;
+}
+
+.sbutton:active {
+border-color:black; /* Changes the border color to red when clicked */
+color: black;
+}
+.sbutton:hover {
+border-color:gray; /* Changes the border color to red when clicked */
+color: gray;
+background-color: #ececec;
+
+}
+.vlabel{
+background-color:white;
+opacity:0.8;
+color:black;
+padding:1px 2px;
+margin:1px;
+font-weight:600;
+}
+
+.mlbl{
+padding:1px 1px 1px 1px;
+opacity:0.8;
+background-color:white;
+}
+
+.checked::after {
+content:"\2611";
+/*
+content: "\2713";
+Position it where desired, for example:
+position: absolute;
+font-size: 20px;
+right: 0;
+top: 0;
+
+*/
+font-size:10px;
+color:green;
+
+}
+.unchecked::after {
+content: "\2612";
+color:red;
+font-size:10px;
+
+/* Position it where desired, for example:
+content: "\0298";
+
+content: "\2610";
+position: absolute;
+font-size: 20px;
+right: 0;
+top: 0;
+color: red;
+*/
+
+
+}
+
 .push-right{
 float:right !important;
 }
@@ -82,35 +165,31 @@ top:3px;
 right:3px;
 z-index:2001;
 }
-.opacity5{opacity:0.5;}
-.vlabel{
-box-sizing:border-box;
-border-radius:2px;
-text-align:center;
-text-decoration:none;
-outline:1px solid;
-/*outline-offset:2px;*/
-display:inline-block;
-background-color:white;
-cursor:pointer;
-opacity:0.8;
-color:black;
-font-size:12px;
-padding:1px 2px;
-margin:1px;
-font-weight:600;
-opacity:0.95;
+.bottom-right{
+position:absolute;
+bottom:3px;
+right:3px;
+z-index:2001;
 }
+.opacity5{opacity:0.5;}
+
 .box{
-display: flex;
-flex-flow: column;
+display:flex;
+flex-flow:column;
 height: 100%;
+}.
+
+.column{
+display:flex;
+flex-flow:column;
 }
 /*
 body {
 height: 100%;
 margin: 0;
 }*/
+.header{position:relative}
+
 .bg{
 border-radius:2px;
 background-color:"white";
@@ -125,7 +204,7 @@ flex: 0 1 60px;
 flex: 1 1 auto;
 }
 .box .row.footer {
-flex: 0 1 40px;
+flex: 0 1 20px;
 }
 .noscroll{
 overflow-x:hidden!important;scrollbar-width:none!important;
@@ -142,13 +221,17 @@ vertical-align:middle;
 .help-text{
 padding:4px;
 margin:0;
-color:darkgray;
+font-size:110%;
 width:100%;
 text-align:left!important;
 }
 .dflx{
 display:flex;
 justify-content:space-between;
+}
+.cflx{
+display:flex;
+justify-content:center;
 }
 </style>
 
@@ -157,72 +240,89 @@ justify-content:space-between;
 <div class="box xauto noscroll">
 
 <div class="row header xauto">
+<a id=btnExplain class="top-right" title="Help">&#x2139;</a>
 <b id=btnTitle>Tile Viewer:&nbsp;</b>
-<button type=button id=btnApplyGeo class=sbutton title="Get tile of geolocation">Here</button>
-<button type=button id=btnExplain class=sbutton title="Get tile of geolocation">Help</button>
-<button type=button id=btnFit class=sbutton>fit</button>
-<button type=button id=btnClear class=sbutton>clear</button>
-<button type=button id=btnTbox title="show tbox options" class=sbutton>Tbox</button>
-<br>
+<a id=btnApplyGeo class=sbutton title="Get tile of geolocation">Here</a>
 
-<span>Precision:</span><input class=tinyinput id=precision value=7 type="number" min="6" max="12">&nbsp;
-<span class=tile-mode id=tile-mode>
-<span>Perimeter:</span><input class=tinyinput id=perimeter value=20 type="number" min="1" max="40">&nbsp;
+<a id=btnClear class="top-left" title=clear>&#x27F3;</a>
+<a id=btnTbox title="show tbox options" class=sbutton>Tbox</a>
+<a id=btnTetrisize class=sbutton title="Add tiles with clicks">Tbag</a>
+<a id=uploadGJ class=sbutton title="Upload GeoJSON">GeoJSON</a>
+
+<div class=" hidden" id="geoFileArea">
+<span class="xauto rel">
+<a class="top-right" id=btnCloseFileG onclick1=vhide('geoFileArea')><i class="fa fa-fw fa-times"></i></a>
+<span class=top-center>Connect a JSON file to marker</span>
+<BR>
+<BR>
+<span class="sbutton">
+<l class=stitle>Upload file</l>
+<div class1="sbutton w96" id=JSONfileButton>
+<input type=file id=jsonFile accept=".json,.txt,.geojson"></input>
+<BR>
+<BR>
+</div>
+</div>
+
+
+
+
+&nbsp;
 </span>
-<span id=tbox-mode class="tbox-mode hidden">
-xi:<input title="Increment to east" class=tinyinput id=xi-input value=10 type="number" min="1">&nbsp;
-yi:<input title="Incrment to south" class=tinyinput id=yi-input value=10 type="number" min="1">&nbsp;
-</span>
-</span>
-<br>
 
 <div style="flex-wrap:wrap;display:flex;">
 
 <span style="flex-grow:1;">
 <a id=btnCopyTN title=tile>Tile:</a>
-<input class=tinyinput1 id="m-number" value="25050" placeholder="valid tile number" type="search">
-<button id=btnTileInfo type=button title="Tile Info" class=sbutton>&nbsp;&#x2139;&nbsp;</button>
-<button id=btnApplyNumber type=button class=sbutton title="">Apply</button>
-</span>
-
-<span class="tbox-mode hidden" style="flex-grow:1;">
-<a id=btnCopyTB title=tile>Tbox:</a>
-<input class=tinyinput1 id="tb-number" readonly value="25050.10102" placeholder="valid tbox number" type="search">
-<button id=btnTBoxInfo type=button title="Tilebox Info" class=sbutton>&nbsp;&#x2139;&nbsp;</button>
-<button id=btnApplyTbox type=button class=sbutton title="">Show</button>
+<input class=tinyinput1 id="tn-number" value="25050" placeholder="valid tile number" type="search">
+<a id=btnTileInfo title="Tile Info" class=sbutton>&nbsp;&#x2139;&nbsp;</a>
+<a id=btnGJselected title="Download selected tiles as GeoJSON" class=sbutton>&nbsp;&dArr;&nbsp;</a>
+<a id=btnApplyNumber class=sbutton title="">Apply</a>
 </span>
 
 </div>
 
-<a title="Click to copy coords" id=btnCopyM title=Marker>&#128392;</a><input class=tinyinput1 id="m-coords" value="0,0" type="search">
-<button id=btnGetTile type=button title="Get tile from coord" class=sbutton>Tile</button>
-<button id=btnLabels type=button class=sbutton>Labels</button>
-<span id="curr-zoom"></span>
+<div style="flex-wrap:wrap;display:flex;">
 
-<br>
+<span style="flex-grow:1;">
+<a title="Click to copy coords" id=btnCopyM title=Marker>&#128392;</a><input class=tinyinput1 id="m-coords" value="0,0" type="search">
+<a id=btnGetTile title="Get tile from coord" class=sbutton>Tile</a>
+<a id=btnLabels class=sbutton>Labels</a>
+</span>
+
+</div>
+
+
 </div>
 
 <div map-area class="row content rel1 xauto">
-<div id=maph class=maph1 style1="width:100%;height:100%; background-color:lightblue;" style="width:100%;height: calc(100vh - 150px); background-color: lightblue;">
+<div id=maph class=maph1 style1="width:100%;height:100%; background-color:lightblue;" style="width:100%;height: calc(100vh - 100px); background-color: lightblue;">
 <div id=message-area class="hidden top-right">
 <div id=message-text class="vlabel">
 </div>
 </div>
 
-<div id=range-area class="vlabel top-left" style="top:50px;z-index:1001;padding:2px;">
-<span title = "Granularity level">
-<input class=tinyinput1 id=level readonly value=2 min="2" max="9" style="width:14px;">
+<div id=range-area class="vlabel column top-left" style="top:80px;left:13px;z-index:1001;padding:2px;">
+<span title="Granularity level">
+<input class=tinyinput1 id=level readonly value=2 min="2" max="7" style="width:14px;">
 </span><BR>
-<input type="range" title=grid id="gg-o" name="drilldown" value = 2 min="2" max="9" style="writing-mode:vertical-lr;color:purple;" />
+<input type="range" title="grid granularity" id="gg-o" value=2 min="2" max="7" style="writing-mode:vertical-lr;color:purple;" />
+<br>
+<btn id=btnFit class1=sbutton title="Fit grid to screen">&#9737;</btn>
+<br>
+<btn id=choice-1 class="level-choice sbutton1 red">R</btn>
+<br>
+<btn id=choice-2 class="level-choice sbutton1 green">G</btn>
+<br>
+<btn id=choice-3 class="level-choice sbutton1 blue">B</btn>
 </div>
 
-<div id=help-area class="bottom-left hidden vlabel" style="bottom:50px;z-index:1001;padding:2px;">
+<div id=details-area class="bottom-left hidden vlabel" style="bottom:50px;z-index:1011;padding:2px;">
 <a id=close-help class="top-right">&#x2716;</a>
 <div id=help-wrap>
 <span id=help-title></span>
 <br>
 <div id=help-text class="help-text">
-
 </div>
 </div>
 </div>
@@ -234,21 +334,87 @@ yi:<input title="Incrment to south" class=tinyinput id=yi-input value=10 type="n
 </div>
 
 
-<div id=explain-area class="top-left vlabel hidden" style="top:50px;left:30px;z-index:1001;padding:2px;">
-<a id=close-explain class="top-right">&#x2716;</a>
-<div id=explain-wrap>
-<span id=explain-title>Help</span>
-<br>
-<div id=explain-text class="help-text" style="width:200px;">
-Click on the map or edit the tile number to view a tile and its boundaries.<br>
-For higher resolution (granularity) move the slider downwards.<br>
-A surrounding tile box will show a context grid that encloses the tile in its center.<br>
-Click on the "labels" button to show the tile numbers in the tile box.<br>
-The purple grid demarks a granularity level 1.
+<div id=tbox-area class="top-right vlabel hidden tbox-mode" style="top:40px;right:4px;z-index:1001;padding:2px;">
+<div class1="tbox-mode hidden" style1="flex-grow:1;">
+<a id=btnCopyTB title=tile>Tbox:</a>
+<input class=tinyinput1 id="tb-number" readonly value="25050.10102" placeholder="valid tbox number" type="search">
+
+<a id=btnTBoxInfo title="Tilebox Info" class=sbutton>&nbsp;&#x2139;&nbsp;</a>
+
 </div>
+
+<div id=tbox-mode class1="tbox-mode">
+<a id=btnApplyTbox class="hidden sbutton" title="Apply grid using tbox number">Create</a>
+</div>
+<div>
+
+
+<span id=static-options>
+xi:<input title="Increment to east" class=tinyinput id=xi-input value=10 type="number" min="1">&nbsp;
+yi:<input title="Incrment to south" class=tinyinput id=yi-input value=10 type="number" min="1">&nbsp;
+<btn class="sbutton" title="Adapt tbox size to tiles" id=btnAdapt>Fit</btn>
+</span>
+
+<span id=float-options><span>Edge:</span><input title="Distance to tiles on the edges" class=tinyinput id=perimeter value=20 type="number" min="1" max="40">
+</span>
+<btn class="sbutton" title="tbox in place" id=btnStatic>Fix</btn>
+<btn class="sbutton" id=btnFloat title="Tbox floats according to the edge size">Float</btn>
+
+
+</div>
+
+
+<div>
+
+<span>Precision:</span>
+<input class=tinyinput id=precision value=7 type="number" min="6" max="12">&nbsp;
+
+Shell:<input title="Extra tiles on edges" class=tinyinput id=shell value=1 type="number" min="0" max="9">
+<span class=tile-mode id=tile-mode></span>
+<btn id=btnTTselected title="Download rasterized tbag of selected tiles as GeoJSON" class=sbutton>Tbag&dArr;</btn>
+</div>
+
+<div id=gjBtns style1="flex-grow:1;" class="gj-btns hidden">
+GeoJSON:
+<btn id=btnShowGJ class="sbutton checked gj">Show</btn>
+<btn id=btnDigGJ class="sbutton gj">Fit</btn>
+<btn id=btnPerGJ class="sbutton gj">Overlay</btn>
+<btn id=btnDownloadGJ title="Download overlay in GeoJSON format" class="sbutton gj">&dArr;</btn>
+<btn id=btnRmvGJ class="sbutton gj" title="Remove GeoJSON">&#x2716;</btn>
+</div>
+
+
+
+
 </div>
 </div>
 
+<div id=explain-area class="bottom-right sbutton hidden1" style="bottom:50px;right:4px;z-index:1002;padding:2px;">
+<a id=close-explain class="top-right">&#x2716;</a>
+<div id=explain-wrap>
+<span id=explain-title>Mini Help</span>
+<br>
+<div id=explain-text class="help-text" style="width:200px;">
+Click on the map or edit the tile number to focus on a tile. A surrounding tile box will show a context grid.<br>
+For higher granularity move the slider downwards.<br>
+
+<btn class=sbutton>Labels</btn> for tile numbering.
+</btn>
+<btn class=sbutton>Tbag</btn> for selecting multiple tiles.
+<br>
+<btn class=sbutton>Here</btn> device GPS tile.
+
+<br>
+The purple grid demarks a granularity level 1.<br>
+<hr>
+Demos:
+<a id=btnDemo class=sbutton title="Enclose a GeoJSON file">Fit</a>
+<a id=btnDigitize class=sbutton title="Overlay a GeoJSON file">Overlay</a>
+<a id=btnUpl class=sbutton title="Upload and overlay a GeoJSON">&nbsp;&uArr;&nbsp;</a>
+<a id=btnTboxDemo class=sbutton title="View Tbox info">Tbox</a>
+</div>
+</div>
+</div>
 
 </div>
 </div>
@@ -270,94 +436,205 @@ The purple grid demarks a granularity level 1.
 var mm={};
 
 function init(){
-
 mm.map=L.map('maph',{zoomControl:false,zoomSnap:0.25,zoomDelta:0.25})
-    
-//.setView([51.505, -0.09], 4);
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {clickable:true,crossOrigin:true,maxZoom:23,maxNativeZoom:20,
 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(mm.map);
 mm.baseLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
 mm.dtLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
+mm.gjLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
+mm.tileLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
 mm.labelLayer=new L.FeatureGroup({interactive:false}).addTo(mm.map);
+
 L.control.scale({updateWhenIdle:true,position:"bottomright"}).addTo(mm.map)
 L.control.zoom({
-        position: 'bottomright' // Options: 'topleft', 'topright', 'bottomleft', 'bottomright'
-    }).addTo(mm.map);
-var zoom = localStorage.getItem("zoom")||"4";
-zoom = parseInt(zoom);
+position: 'topleft'
+}).addTo(mm.map);
+var zoom=localStorage.getItem("zoom")||"4";
+zoom=parseInt(zoom);
 mm.map.setZoom(zoom);
 _('level').value=localStorage.getItem("level")||2;
-_('gg-o').value=mm.g = parseInt(_('level').value);
+_('gg-o').value=mm.g=parseInt(_('level').value);
 mm.popups=[];
+mm.shell=1;
 
 initFuncs();
 initEvents();
 
-_('help-area').onclick=(e)=>{e.stopPropagation()}
-_('explain-area').onclick=(e)=>{e.stopPropagation()}
-_('range-area').onclick=(e)=>{e.stopPropagation()}
 
-_('gg-o').onchange=(e)=>{
-//var dd = _('dd-m').value =_('dd-o').value;
-_('level').value=mm.g =parseInt(_('gg-o').value);
-var o = st2point(_('m-coords').value);
-
-if(o){
-mm.loc = o;
-mm.applyCoords(o.lat,o.lng);
-if(mm.mode){mm.tbInfo()}else{mm.clearHelp()};
-mm.fit();
-}
-}
-
-
-var st = localStorage.getItem("lastMarker")||"0.1,0.1";
-_('m-coords').value = st;
-
-var o = st2point(st);
-var lastTile = DT.find(o.lat,o.lng,mm.g);
+var st=localStorage.getItem("lastMarker")||"0.1,0.1";
+_('m-coords').value=st;
+var o=st2point(st);
+var lastTile=DT.find(o.lat,o.lng,mm.g);
 if(lastTile){
-_('m-number').value = lastTile.n;
+_('tn-number').value=lastTile.n;
 }
-
-_('btnApplyTbox').onclick = ()=>{
-var xi=_('xi-input').value||10;
-xi = parseInt(xi);
-mm.xi = xi;
-var yi=_('yi-input').value||10;
-yi = parseInt(yi);
-mm.yi = yi;
-mm.applyTbox(mm.xi,mm.yi);
-}
-
 
 mm.map.panTo([o.lat,o.lng]);
-mm.plOpt = {color:"purple",weight:2,opacity:0.6,fillOpacity:0}
-
-var tb 
-
-tb = new DT.Tbox('100',9,9);
+mm.plOpt={color:"purple",weight:1,opacity:0.6,fillOpacity:0}
+var tb;
+tb=new DT.Tbox('100',9,9);
 var lines=tb.lines;
 mm.gridlines=L.polyline(lines,mm.plOpt).addTo(mm.baseLayer);
-
 mm.perimeter=parseInt(_('perimeter').value);
 mm.applyCoords(o.lat,o.lng);
-//mm.drawTile();
-//mm.drawSurround();
+
 }//init end
 
-mm.applyCoords=(lat,lng)=>{
+
+function initFuncs(){
+
+mm.clearTiles=(l)=>{
+mm.tileLayer.clearLayers()
+mm.pack1=[];
+mm.pack2=[];
+mm.pack3=[];
+}
+
+mm.tetris=(l)=>{
+if(l){
+mm.tetrisOn=1;
+//mm.static(1);
+makeOn('btnTetrisize');
+}else{
+mm.tetrisOn=0;
+makeOff('btnTetrisize');
+mm.clearTiles();
+mm.drawTile()
+
+}
+}
+mm.static=(l)=>{
+if(!(l)){
+mm.floatOn=1;
+
+hide('static-options');
+show('float-options');
+makeOn('btnFloat');
+makeOff('btnStatic');
+//makeOn('btnTetrisize');
+}else{
+mm.floatOn=0;
+show('static-options');
+hide('float-options');
+makeOff('btnFloat');
+makeOn('btnStatic');
+mm.applyStatic();
+}
+}
+
+mm.chooseLevel=(l)=>{
+
+const elements=document.querySelectorAll('.' + 'level-choice');
+// Iterate over the resulting NodeList
+elements.forEach(element => {
+// Use classList.remove() to remove the specific class from each element
+element.classList.remove("sbutton");
+});
+
+//makeOff("choice-1");
+//makeOff("choice-2");
+//makeOff("choice-3");
+mm.bagLevel=l;
+if(l==1){
+_("choice-1").classList.add("sbutton")
+//makeOn("choice-1");
+}
+if(l==2){
+_("choice-2").classList.add("sbutton")
+
+//makeOn("choice-2");
+}
+if(l==3){
+//makeOn("choice-3");
+_("choice-3").classList.add("sbutton")
+}
+_("range-area").focus();
+}
+
+mm.applyStatic=()=>{
+var xi=_('xi-input').value||10;
+xi=parseInt(xi);
+mm.xi=xi;
+var yi=_('yi-input').value||10;
+yi=parseInt(yi);
+mm.yi=yi;
+//mm.static(1);
+mm.applyTbox(mm.tile.n,mm.xi,mm.yi);
+
+}
+
+mm.applyFloat=()=>{
+
+}
+
+mm.onEachFeature=(feature,layer)=>{
+var prop=feature.properties;
+var optStyle ;//= objectCopy(mm.plOpt)
+if(prop){
+if(prop.color){
+optStyle=Object.assign(mm.plOpt,{color:prop.color})
+}
+if(prop.n && prop.type=="tile"){
+//console.log(prop.n)
+};
+}
+
+
+if (feature.geometry && feature.geometry.type){
+if(feature.geometry.type == "Polygon"){
+layer.setStyle(optStyle);
+//if(text){layer.bindTooltip(text)};
+}
+
+
+}
+}
+
+mm.applyTile=()=>{
+
+if(mm.tile){
+var n=mm.tile.n;
+
+
+if(mm.floatOn){
 mm.clearDT();
+mm.drawSurround();
+}
+
+if(mm.tetrisOn){
+
+if(mm.pack1.includes(n)||mm.pack2.includes(n)||mm.pack3.includes(n)){
+}else{
+mm.drawTile(true);
+}
+
+}else{
+//tetrisOff
+mm.clearTiles();
+mm.drawTile(true);
+}
+
+
+}
+
+}
+
+mm.applyCoords=(lat,lng)=>{
+
+var n;
+//mm.clearDT();
 var precision=mm.precision;
 
 var latlng=DT.nFormat(lat,precision)+","+DT.nFormat(lng,precision);
-
+if(mm.marker){
+//	mm.dtLayer.removeLayer(mm.marker)
+}
 mm.marker=L.marker([lat,lng]).addTo(mm.dtLayer);
 _('m-coords').value=latlng;
 localStorage.setItem("lastMarker",latlng);
 mm.tile=DT.find(lat,lng,mm.g);
-_('m-number').value = mm.tile.n;
+_('tn-number').value=n=mm.tile.n;
 var ttp=L.tooltip({
 opacity:0.9,
 offset:[4,4],
@@ -369,95 +646,376 @@ direction:"bottom"
 }).setContent(latlng+"<BR>"+mm.tile.n);
 
 mm.marker.bindTooltip(ttp);
-mm.drawTile(true)
-mm.drawSurround()
-	
+
+mm.applyTile()
+
+
 }
-function initFuncs(){
 
+mm.adaptBag=()=>{
+if(mm.pack1.length>0 ||mm.pack2.length>0||mm.pack3.length>0){
 
-mm.applyTbox=(xi,yi)=>{
-if(!mm.tile){
+var tbag=mm.tbox.tbag();
+if(mm.pack1.length>0){
+tbag.addList(1,mm.pack1,1);
+tbag.addProp(1,{color:"red"})
+}
+if(mm.pack2.length>0){
+tbag.addList(2,mm.pack2)
+tbag.addProp(2,{color:"green"})
+}
+if(mm.pack3.length>0){
+tbag.addList(3,mm.pack3);
+tbag.addProp(3,{color:"blue"})
+}
+
+var tbox=tbag.adapt();
+var tn=tbox.tn;
+var xi=tbox.xi;
+var yi=tbox.yi;
+mm.applyTbox(tn,xi,yi);
+}else{
+alrt("Bag is empty")
+}
+}
+
+mm.bagChoices=(mode)=>{
+if(mm.pack1.length>0 ||mm.pack2.length>0||mm.pack3.length>0){
+var tbag=mm.tbox.tbag();
+if(mm.pack1.length>0){
+tbag.addList(1,mm.pack1,1);
+tbag.addProp(1,{color:"red"})
+}
+if(mm.pack2.length>0){
+tbag.addList(2,mm.pack2)
+tbag.addProp(2,{color:"green"})
+}
+if(mm.pack3.length>0){
+tbag.addList(3,mm.pack3);
+tbag.addProp(3,{color:"blue"})
+}
+
+var precision=mm.precision||6;
+var j;
+
+if(mode==1){
+tbag.rasterize();
+j =tbag.rasterJSON()
+}else{
+j =tbag.bagJSON()
+}
+j=JSON.stringify(j,null,2)
+
+var dname;
+dname="selected"+".json"
+let a=document.createElement("a");
+a.download=dname;
+j=new Blob([j], {type: "text/plain"});
+a.href=URL.createObjectURL(j);
+a.click();
+}else{
+getJSON(mm.tile.n)
+}
+}
+
+mm.gjShow=(l)=>{
+//if(mm.gj){mm.gjLayer.removeLayer(mm.gj)}
+if(l){
+//if(mm.gj){mm.gj.addTo(mm.gjLayer)}
+mm.gjLayer.addTo(mm.map)
+mm.gjShown=1;
+makeOn('btnShowGJ');
+}else{
+mm.map.removeLayer(mm.gjLayer)
+mm.gjShown=0;
+makeOff('btnShowGJ');
+}
+}
+
+mm.zUpdate=()=>{
+var currZoom=mm.map.getZoom();
+mapinfo("Zoom: "+ currZoom + " G: " + mm.g);
+localStorage.setItem("zoom",''+currZoom)
+mm.cleanOverlap();
+}
+
+mm.applyTbox=(tn,xi,yi,add)=>{
+mm.clearDT();
+if(!tn){
 alrt("Anchor tile missing")
 return;
 }
+
+if(tn){
+_('tb-number').value=tn;
+_('xi-input').value=xi;
+_('yi-input').value=yi;
+
+//mm.drawTile(mm.tile.n);
+var tbox=new DT.Tbox(tn,xi,yi)
+//var tbox=new DT.Tbox(mm.tile.n,xi,yi,mm.tile.options)
+//console.log(tbox);
+
+//_('tb-number').value=tbox.n;
+
+var lines=tbox.lines;
+var options=objectCopy(mm.plOpt)
+options.color="blue";
+options.opacity=0.7;
+if(!(add)){
+if(mm.lines){
+mm.dtLayer.removeLayer(mm.lines)
+}
+}
+//var coords=mm.tile.coords;
+mm.lines=L.polyline(lines,options).addTo(mm.dtLayer);
+mm.tbox=tbox;
+_('tb-number').value=tbox.n;
+mm.showAnchor();
+var coords=tbox.coords;
+mm.map.closePopup();
+mm.map.fitBounds(coords,{paddng:[0,0]});
+//mm.tbInfo()
+}
+}
+
+mm.downloadTbag=(tbag,nice)=>{
+if(!tbag || !tbag._bag ){
+alrt("Invalid Tbox")
+return;
+}
+
+var j=tbag.exportJSON()
+//console.log(j)
+var dname;
+dname=tbag.n.replace(".","_") +".json"
+
+if(nice){
+j=JSON.stringify(j,null,2);
+}else{
+j=JSON.stringify(j);
+}
+let a=document.createElement("a")
+a.download=dname;
+j=new Blob([j], {type: "text/plain"});
+a.href=URL.createObjectURL(j);
+a.click();
+}
+
+mm.showTbag=(tbag)=>{
+if(!tbag || !tbag._bag ){
+alrt("Invalid Tbox")
+return;
+}
+mm.clearDT();
+mm.map.closePopup();
+var options=objectCopy(mm.plOpt)
+options.color="red";
+options.opacity=0.7;
+options.fillOpacity=0.1;
+//mm.lines=L.polyline(lines,options).addTo(mm.dtLayer);
+
+var bagLevel;
+var level1,level2,level3=[];
+var level1=tbag.getLevel(1).tiles;
+var level2=tbag.getLevel(2).tiles;
+bagLevel=tbag.getLevel(3)
+if(bagLevel){level3=tbag.getLevel(3).tiles};
+mm.clearTiles();
+
+var tn=tbag.tn;
+mm.tile=new DT.Tile(tn,tbag.options);
+mm.static(1);
+mm.applyTbox(tn,0,0);
+//mm.applyTile();
+//var level1=[...new Set(level1)];
+level1.forEach(tn=>{
+var coords=new DT.Tile(tn).coords;
+L.polygon(coords,options).addTo(mm.dtLayer);
+})
+options.fillOpacity=0.1;
+options.color =options.fillColor="purple";
+level2.forEach(tn=>{
+var coords=new DT.Tile(tn).coords;
+L.polygon(coords,options).addTo(mm.dtLayer);
+})
+options.color=options.fillColor= "orange";
+
+level3.forEach(tn=>{
+var coords=new DT.Tile(tn).coords;
+L.polygon(coords,options).addTo(mm.dtLayer);
+})
+
+
+}
+
+mm.tboxData=(l)=>{
+if(l){
+mm.mode=1;
+makeOn('btnTbox')
+$('.tbox-mode').removeClass("hidden");
+//mm.tbInfo();
+}else{
+mm.mode=0;
+makeOff('btnTbox')
+$('.tbox-mode').addClass("hidden");
+//$('.tile-mode').removeClass("hidden");
+}
+}
+
+
+mm.showTboxData=()=>{
+var tbox=mm.tbox;
+mm.tboxData(1)
+_('tb-number').value=tbox.n;
+_('xi-input').value=tbox.xi;
+_('yi-input').value=tbox.yi;
+_('tn-number').value=tbox.tn;
+//_('level').value=_('gg-o').value=mm.g=tbox.g;
+}
+
+mm.showTbox=()=>{
+
+var tbox=mm.tbox;
+if(!tbox){
+alrt("Invalid Tbox")
+return;
+}
+
 mm.clearDT();
 
 
-if(mm.tile){
+mm.applyTbox(tbox.tn,tbox.xi,tbox.yi)
+
+//mm.showTboxData()
+
+
+/*
+var tile=new DT.Tile(tbox.tn);
+if(tile){
+mm.tile=tile;
 mm.drawTile(mm.tile.n);
-var tbox = new DT.Tbox(mm.tile.n,xi,yi,mm.tile.options)
+//var tbox=new DT.Tbox(mm.tile.n,xi,yi,mm.tile.options)
 //console.log(tbox);
-_('tb-number').value = tbox.n;
-	
-var lines = tbox.lines;
-var options = objectCopy(mm.plOpt)	
-options.color = "blue";
-options.opacity = 0.7;
-
-//var coords=mm.tile.coords;
+var lines=tbox.lines;
+var options=objectCopy(mm.plOpt)
+options.color="black";
+options.opacity=0.7;
 mm.lines=L.polyline(lines,options).addTo(mm.dtLayer);
-mm.tbox = tbox;
-var coords=tbox.coords;
 mm.map.closePopup();
+//mm.tbInfo();
+}*/
+}
 
-mm.map.fitBounds(coords,{paddng:[0,0]});
-mm.tbInfo()
-}
-}
 
 mm.fit=()=>{
-/*
-if(mm.gridlines){
-	var bounds = mm.gridlines.getBounds();
-	mm.map.fitBounds(bounds,{paddng:[2,2]});
-}*/
 
 if(mm.tbox){
-var coords = mm.tbox.coords;
+var coords=mm.tbox.coords;
 coords.forEach(crd=>{crd=DT.offsetter(crd,mm.tbox.offset)
 //console.log(crd[1])
 })
 
-let southWest = L.latLng(coords[3][0],coords[3][1]); // South-West coordinate
-let northEast = L.latLng(coords[1][0],coords[1][1]); // North-East coordinate (which is 170W)
-let bounds = L.latLngBounds(southWest, northEast);
+let southWest=L.latLng(coords[3][0],coords[3][1]); // South-West coordinate
+let northEast=L.latLng(coords[1][0],coords[1][1]); // North-East coordinate (which is 170W)
+let bounds=L.latLngBounds(southWest, northEast);
 //console.log(bounds)
 mm.map.fitBounds(bounds,{
 paddingTopLeft: L.point(0, 0),
-paddingBottomRight: L.point(0, 0) 
+paddingBottomRight: L.point(0, 0)
 })
 }
 }
 
 mm.drawTile=(l,move,opt)=>{
-var tn =_("m-number").value;
+var tn =_("tn-number").value,offset=0,tile;
+
 if(mm.tile){
-//if(DT.validTN(tn)){
+tile=mm.tile;
+offset=tile.offset;
 var xi=_('xi-input').value||10;
 var yi=_('yi-input').value||10;
-//var tbn = new DT.Tbox(tn,xi,yi)
-var tbn = mm.tile;
-_('tb-number').value = tbn.n;
-var options = objectCopy(mm.plOpt)
-options.color = "green";
-options.fillOpacity = 0.13;
-// mm.tile = new DT.Tile(tn);
+var options=objectCopy(mm.plOpt);
+
+options.color="red";
+if(mm.bagLevel==2){options.color="green"}
+if(mm.bagLevel==3){options.color="blue"}
+options.fillOpacity=0.13;
 if(!(mm.tile.valid)){
 alrt("Not a valid tile")
-	return
+return;
 }
 var coords=mm.tile.coords;
-mm.tilePoly=L.polygon(coords,options).addTo(mm.dtLayer);
+var tilePoly=L.polygon(coords,options).addTo(mm.tileLayer);
 }else{
 alrt("Non valid tile number")
+return;
 }
-var mapBounds = mm.map.getBounds();
-var a = mm.tile.a;
-// Check if the coordinate is within the map bounds
+var mapBounds=mm.map.getBounds();
+var a=mm.tile.a;
+var crds=tile.coords;
+var a= crds[0],b= crds[1],c= crds[2],d= crds[3];
 
-mm.showAbcd(mm.tile.coords)
-mm.qInfo(tn);
+var mIcon;
+
+mIcon=L.divIcon({
+className: 'opacity8',
+html: '<a style="width:20px;" class="mlbl">' + tile.n +'</a>',
+html: '<div style="width:max-content;max-width:200px;" class="mlbl bg push-right">' + tile.n +'</div>',
+iconAnchor: [12,24]
+});
+//var mC=L.marker(c,{icon:mIcon,title:c,className1:"mlbl"}).addTo(mm.tileLayer);
+//mC.on("click",()=>{	mm.qInfo(tile.n,tile.offset)})
+
+
+
+mIcon=L.divIcon({
+className: 'opacity8',
+html: '<a style="width:20px;" class="mlbl">' + '&#x2139;' +'</a>',
+iconAnchor: [0,0]
+});
+var mA=L.marker(a,{icon:mIcon,title:tile.n})
+mA.on("click",()=>{mm.qInfo(tile.n,null,tile.offset)})
+
+mIcon=L.divIcon({
+className: 'opacity8',
+html: '<a style="width:20px;" class="mlbl">' + "&#x2716;" +'</a>',
+iconAnchor: [24,0]
+});
+var mB=L.marker(b,{icon:mIcon,title:"Remmove",className1:"mlbl"})
+
+mIcon=L.divIcon({
+className: 'opacity8',
+html: '<div style="width:20px;" class="mlbl">' + "d" +'</div>',
+iconAnchor: [-2,26]
+});
+//var mD=L.marker(d,{icon:mIcon,title:d}).addTo(mm.dtLayer);
+
+mB.addTo(mm.tileLayer);
+mA.addTo(mm.tileLayer);
+
+
+mB.on("click",()=>{
+mm.tileLayer.removeLayer(mA);
+mm.tileLayer.removeLayer(mB);
+//mm.tileLayer.removeLayer(mC);
+//mm.dtLayer.removeLayer(mD);
+mm.tileLayer.removeLayer(tilePoly);
+mm.pack1=mm.pack1.filter(item => item !== tile.n);
+mm.pack2=mm.pack2.filter(item => item !== tile.n);
+mm.pack3=mm.pack3.filter(item => item !== tile.n);
+
+});
+
+
+if(mm.tetrisOn){
+mm["pack"+mm.bagLevel].push(tn);
+mm.cleanOverlap();
+}else{
+mm.qInfo(tn,4000);
+
+}
+
 if (mapBounds.contains(a)) {
 } else {
 mm.map.panTo(a)
@@ -465,18 +1023,19 @@ mm.map.panTo(a)
 }
 
 mm.drawSurround=(l,opt)=>{
-var tn =_("m-number").value;
+mm.clearDT();
+var tn =_("tn-number").value;
 //if(DT.validTN(tn)){
 if(mm.tile){
-var options = objectCopy(mm.plOpt);
-options.color = "black";
-options.opacity = 0.7;
-//mm.tile = new DT.Tile(tn);
+var options=objectCopy(mm.plOpt);
+options.color="black";
+options.opacity=0.7;
+//mm.tile=new DT.Tile(tn);
 
 //console.log(mm.tile)
-mm.tbox = mm.tile.surround(mm.perimeter);
-var lines = mm.tbox.lines;
-_('tb-number').value = mm.tbox.n;
+mm.tbox=mm.tile.surround(mm.perimeter);
+var lines=mm.tbox.lines;
+_('tb-number').value=mm.tbox.n;
 mm.showAnchor();
 mm.lines=L.polyline(lines,options).addTo(mm.dtLayer);
 }else{
@@ -484,23 +1043,41 @@ alrt("Non valid tile number")
 }
 }
 
-mm.clearDT=()=>{
+mm.clearDT=(hardClear)=>{
 _("extras").innerHTML="";
-mm.clrLabels();
 mm.map.closePopup();
-mm.map.closePopup();
-//$(".leaflet-popup-close-button").click()
+if(mm.tetrisOn){
 
+}else{
+mm.clearTiles();
+mm.clrLabels();
+
+}
+if(mm.floatOn){
 if(mm.dtLayer){
 mm.dtLayer.clearLayers();
 }
 }
+if(hardClear){
+if(mm.dtLayer){
+mm.dtLayer.clearLayers();
+}
+if(mm.tileLayer){
+mm.tileLayer.clearLayers();
+}
+mm.gjLayer.clearLayers();
+
+}
+
+}
+
 mm.clearHelp=()=>{
 $('#help-title').html("");
 $('#help-text').html("");
-$('#help-area').addClass("hidden");
+$('#details-area').addClass("hidden");
 }
-mm.showAnchor=function(){
+
+mm.showAnchor=()=>{
 //mm.clearHelp()
 if(mm.anchorIcon){
 mm.dtLayer.removeLayer(mm.anchorIcon)
@@ -508,83 +1085,66 @@ mm.dtLayer.removeLayer(mm.anchorIcon)
 if(mm.tbox){
 var mIcon;
 mIcon=L.divIcon({
-className1: 'bg',
-html: '<div style="width:24px;" class="vlabel">' + '&#x2693;' +'</div>',
-iconAnchor: [-2,-2]
+className: 'opacity8',
+html1: '&#x2693;',
+html: '<div style="width:20px;" class="mlbl">' + '&#x2693;' +'</div>',
+iconAnchor: [4,26]
 });
-var a = DT.offsetter(mm.tbox.nw,mm.tbox.offset);
-mm.anchorIcon=L.marker(a,{icon:mIcon,title:a}).addTo(mm.dtLayer);
+var a=DT.offsetter(mm.tbox.nw,mm.tbox.offset);
+mm.anchorIcon=L.marker(a,{icon:mIcon,title:mm.tbox.n,className1:"mlbl"}).addTo(mm.dtLayer);
 mm.anchorIcon.on("click",(e)=>{
-	mm.tbInfo()
+mm.tbInfo()
 })
 }
 }
 
-mm.showAbcd=function(crds){
-var a= crds[0],b= crds[1],c= crds[2],d= crds[3];
-
-var mIcon;
-mIcon=L.divIcon({
-className1: 'bg',
-html: '<div style="width:24px;" class="vlabel">' + "a" +'</div>',
-iconAnchor: [-2,-2]
-});
-mm.mA=L.marker(a,{icon:mIcon,title:a}).addTo(mm.dtLayer);
-
-
-mIcon=L.divIcon({
-className1: 'bg',
-html: '<div style="width:24px;" class="vlabel">' + "b" +'</div>',
-iconAnchor: [28,-2]
-});
-mm.mB=L.marker(b,{icon:mIcon,title:b}).addTo(mm.dtLayer);
-
-
-mIcon=L.divIcon({
-className1: 'vlabel1',
-html: '<div style="width:24px;" class="vlabel">' + "c" +'</div>',
-iconAnchor: [28,26]
-});
-mm.mC=L.marker(c,{icon:mIcon,title:c,className1:"vlabel"}).addTo(mm.dtLayer);
-
-mIcon=L.divIcon({
-className1: 'bg',
-html: '<div style="width:24px;" class="vlabel">' + "d" +'</div>',
-iconAnchor: [-2,26]
-});
-mm.mD=L.marker(d,{icon:mIcon,title:d}).addTo(mm.dtLayer);
-
-
-setTimeout(()=>{
-if(mm.mD){
-		mm.dtLayer.removeLayer(mm.mA);
-		mm.dtLayer.removeLayer(mm.mB);
-		mm.dtLayer.removeLayer(mm.mC);
-		mm.dtLayer.removeLayer(mm.mD);
-}
-},20000)
+mm.showAbcd=function(tile){
 
 }
 
+mm.cleanOverlap=function(){
+function overlap(rect1, rect2) {
+return(!(rect1.right < rect2.left ||
+rect1.left > rect2.right ||
+rect1.bottom < rect2.top ||
+rect1.top > rect2.bottom));
+}
+var rects=[];
+var els=document.querySelectorAll(".mlbl");
+//var els=document.querySelectorAll(".leaflet-marker-icon");
+for (var i=0; i < els.length; i++){
+els[i].style.visibility='';
+rects[i]=els[i].getBoundingClientRect();
+}
+for (var i=0; i < els.length; i++) {
+if (els[i].style.visibility != 'hidden') {
+for (var j=i + 1; j < els.length; j++) {
+if (overlap(rects[i], rects[j])){
+els[j].style.setProperty("visibility", "hidden", "important")
+}
+}
+}
+}
+}
 
 mm.tileBtn=function(layer,tile,offset,cb){
 var opt ={offset:offset||0,p:6}
-//debugger;
+
 //var tile=new DT.Tile(tn,opt);
 if(tile.valid){
 var ofs=tile.offset||0;
 ofs=ofs * 360;
 var pos=tile.c;
 var mIcon=L.divIcon({
-className: 'opacity8 tlbl',
-html: '<div style="width:max-content;max-width:200px;" class="f80 sbutton bg push-right">' + tile.n +'</div>',
+className: 'obacity8',
+html: '<div style="width:max-content;max-width:200px;" class="mlbl bg push-right">' + tile.n +'</div>',
 iconAnchor: [12,24]
 });
-//var se = tile.c;
+//var se=tile.c;
 
 //if(tile.offset){console.log(tile.offset + " " + pos);}
 var m=L.marker(pos,{icon:mIcon}).addTo(layer)
-var tn = m.dt=tile.n;
+var tn=m.dt=tile.n;
 m.on("click",(e)=>{
 alrt(tn);
 mm.qInfo(tn);
@@ -595,39 +1155,33 @@ return m;
 
 mm.clrLabels=()=>{
 mm.labelsOn=0;
-mm.labelLayer.clearLayers();	
+mm.labelLayer.clearLayers();
 }
 
 
 mm.labelTiles=function(tbox,cb){
 mm.clrLabels();
 if(tbox){
-/*
-var tiles=tbox.list;
-mm.labelsOn=1;
-tiles.forEach((dt)=>{
-mm.tileBtn(mm.labelLayer,dt,cb);
-})*/
 var tiles=tbox.tiles;
 mm.labelsOn=1;
 tiles.forEach((dt)=>{
 mm.tileBtn(mm.labelLayer,dt,cb);
 })
+mm.cleanOverlap();
 }
 }
 
 
-mm.tbInfo=()=>{
+mm.tbInfo=(bag)=>{
 //var tb=new DT.Tbox(tbn);
 var tb=mm.tbox;
-var coords = tb.coords;
-//var pos = tb.centerCoords;
-//debugger;
+//var pos=tb.centerCoords;
+
 //var pos=mm.map.getCenter();
 //mm.map.closePopup();
 mm.tbInfoDet=(tb)=>{
-var det = ""
-det += '<div style = "padding:4px;">';
+var det=""
+det += '<div style="padding:4px;">';
 det += "Tbox: "
 det+='<a onclick=copyText("'+ tb.n +'")>'+tb.n+'</a>';
 det += "<hr>";
@@ -704,54 +1258,51 @@ det+="<hr>";
 det+="<span>";
 det+='<a class=sbutton onclick=tbJSON("'+ tb.n +'")>'+'geoJSON'+'</a>';
 det+='<a class=sbutton onclick=tbJSON("'+ tb.n +'",1)>'+'Styled geoJSON'+'</a>';
+//if(mm.bag){det+='<a class=sbutton onclick=bagJSON("'+ tb.n +'",1)>'+'Tbag geoJSON'+'</a>';}
 det+="</span>";
 det+='</div>';
 return det;
 }
 
+if(tb){
+var coords=tb.coords;
 
-var det = mm.tbInfoDet(tb)
-/*
-var pos = tb.nw;
-pos = DT.offsetter(pos,tb.offset);
-mIcon=L.divIcon({
-className1: 'bg',
-html: '' + "TBox" +'',
-        iconSize: [25, 41], // Size of your icon
-        iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
-        popupAnchor: [0, -41] // Point from which the popup should open, relative to the iconAnchor
-});
-mm.tbAnchor=L.marker(pos,{icon:mIcon,title:"Tile box anchor"}).addTo(mm.dtLayer);
-mm.tbAnchor.bindPopup(det).openPopup();
-*/
-$('#help-area').removeClass("hidden");
-_('help-title').innerHTML = "Tile box info";
-_('help-text').innerHTML = det;
+var det=mm.tbInfoDet(tb)
+$('#details-area').removeClass("hidden");
+_('help-title').innerHTML="Tile box info";
+_('help-text').innerHTML=det;
+}
 }
 
-mm.qInfo=(tl)=>{
-var options = mm.tile.options;
+mm.qInfo=(tl,to)=>{
+var options=mm.tile.options;
 var q=new DT.Tile(tl,options);
 var det=mm.qInfoDet(q);
 
 var pos=q.a;
 //mm.map.closePopup();
 //if(!map.popupPlace){map.popupPlace=map.getCenter();}
-var popup = L.popup({ autoClose:false,closeOnClick:false,autoPanPadding:[20,20],offset:[10,10]});
+var popup=L.popup({ autoClose:false,closeOnClick:false,autoPanPadding:[20,20],offset:[10,10]});
 
-popup.setLatLng(pos)
-popup.setContent(det)
-popup.openOn(mm.map)
+popup.setLatLng(pos);
+popup.setContent(det);
+popup.openOn(mm.map);
 mm.popups.push(popup);
+if(to){
+setTimeout(()=>{
+popup.remove();
+},to)
+}
+
 }
 
 
 mm.qInfoDet=(q)=>{
 let precision=parseInt(_("precision").value);
-var tn = q.n;
+var tn=q.n;
 var coords=q.coords;
 var corners="[[" + q.a + "],[" + q.b + "],[" + q.c + "],[" + q.d+"]]";
-var width = getWidth(q.coords);
+var width=getWidth(q.coords);
 if(width > 1000){
 width=width / 1000
 var miles=DT.nFormat(width  /  1.609343502101154,2)
@@ -761,7 +1312,7 @@ width+=miles + " miles"
 width=width + " meters"
 }
 var name=q.name;
-if(q.number){
+if(q.n){
 name=q.number;
 }
 var det=""
@@ -822,29 +1373,189 @@ det+="</div>"
 return det
 }//qInfo
 
+mm.changeG=(g)=>{
+_('gg-o').value=mm.g=_('level').value =g||5;
+localStorage.setItem("level",mm.g);
+mm.zUpdate();
+}
+
+mm.pixIt=(data,pixelize,g,incr)=>{
+mm.tboxData(1);
+
+mm.bag=null;
+mm.gj=L.geoJson(data,{onEachFeature:mm.onEachFeature});
+show('gjBtns');
+mm.changeG(g);
+//_('gg-o').value=mm.g=_('level').value =g||5;
+var bounds=DT.boundsJSON(data,mm.g,6);
+mm.clearDT(true);
+//if(mm.gj){mm.gjLayer.removeLayer(mm.gj)}
+mm.gj.addTo(mm.gjLayer);
+var tbag= DT.tbagJSON(data,mm.g,6);
+if(!DT.filled(tbag)){
+console.log("Could not pixelize");
+return;
+}
+
+//console.log(tbag.g);
+if(tbag.g!=mm.g){
+
+mm.changeG(tbag.g)
+}
+mm.tbag=tbag;
+var tbox=tbag.tbox();
+if(tbox.valid){
+mm.tbox=tbox;
+if(pixelize){
+//mm.static(1);
+tbag.digitize();
+incr=parseInt(incr)||0;
+if(incr){
+
+tbag.threshold(incr);
+}
+if(pixelize==1){
+mm.showTbag(tbag);
+}else{
+mm.downloadTbag(tbag);
+}
+//mm.bag=tbag._bag;
+//console.log(tbag._bag)
+}else{
+mm.showTbox(mm.tbox);
+}
+}
+var gjBounds=mm.gj.getBounds();
+mm.gjShown=1;
+
+//console.log(gjBounds);
+mm.map.fitBounds(gjBounds);
+
+}
+
+
+mm.fetchDemo=(pixelize)=>{
+fetch("https://raw.githubusercontent.com/DTile/tiler/main/docs/media/FirisEaton.geojson")
+.then(function(response){
+return response.json()
+})
+.then(
+function(data){
+mm.pixIt(data,pixelize,5,mm.shell)
+})
+.catch(function(error){
+alrt("File unavailable or has an incorrect format")
+console.log(`This is the error: ${error}`)
+console.error("Stack trace:", error.stack); // This provides the line error
+
+})
+}
+
+
 
 }//initFuncs
 
 function initEvents(){
 
-mm.map.on("moveend",(e)=>{
-var currZoom=mm.map.getZoom();
-mapinfo("Zoom: "+ currZoom);
-localStorage.setItem("zoom",''+currZoom)
-})
+//mm.tbox(1);
+mm.pack1=[];
+mm.pack2=[];
+mm.pack3=[];
+
+//makeOff('btnTbox');
+mm.tboxData(1);
+mm.static(0);
+mm.tetris(1);
+
+mm.drawSurround();
+mm.chooseLevel(1);
+
+_('details-area').onclick=(e)=>{e.stopPropagation()}
+_('btnGJselected').onclick=()=>{mm.bagChoices(0)}
+_('btnTTselected').onclick=()=>{mm.bagChoices(1)}
+_('btnStatic').onclick=()=>{mm.static(1)}
+_('btnFloat').onclick=()=>{mm.static(0)}
+_('uploadGJ').onclick=()=>{_('jsonFile').click()}
+_('btnUpl').onclick=()=>{_('jsonFile').click()}
+_('btnDemo').onclick=()=>mm.fetchDemo();
+_('btnDigitize').onclick=()=>mm.fetchDemo(1);
+_('btnTboxDemo').onclick=()=>{
+mm.fit(1);
+mm.tbInfo(_('tb-number').value);
+}
+
+_('btnTetrisize').onclick=()=>{
+if(mm.tetrisOn){
+mm.tetris(0)
+}else{
+mm.tetris(1)
+}
+}
+
+_('jsonFile').onchange=(e)=>{
+var input=e.target;
+var reader=new FileReader();
+reader.onload=function(){
+var text=reader.result;
+if(validJSON(text)){
+var j=JSON.parse(text);
+mm.pixIt(j,1,mm.g,mm.shell)
+}else{
+alrt("Not a valid geoJSON file")
+}
+input.value=null;
+};
+reader.readAsText(input.files[0]);
+}
 
 
+_('tbox-area').onclick=(e)=>{e.stopPropagation()}
+_('explain-area').onclick=(e)=>{e.stopPropagation()}
+_('range-area').onclick=(e)=>{e.stopPropagation()}
+
+_('shell').onchange=(e)=>{
+mm.shell=_('shell').value
+}
+
+_('gg-o').onchange=(e)=>{
+_('level').value=mm.g =parseInt(_('gg-o').value);
+var o=st2point(_('m-coords').value);
+mm.static(0);
+mm.clearTiles();
+if(o)
+mm.loc=o;
+if(mm.tetrisOn){
+mm.applyCoords(o.lat,o.lng);
+}
+if(mm.mode){
+//mm.tbInfo()
+}else{
+mm.clearHelp()
+};
+mm.fit();
+}
+
+mm.map.on("zoomend",(e)=>{mm.zUpdate()});
+_('choice-1').onclick=()=>mm.chooseLevel(1);
+_('choice-2').onclick=()=>mm.chooseLevel(2);
+_('choice-3').onclick=()=>mm.chooseLevel(3);
 mm.map.on("click",(e)=>{
+if(mm.marker){mm.dtLayer.removeLayer(mm.marker)};
 var lat=e.latlng.lat;
 var lng=e.latlng.lng;
 if(lat>85){lat=85};
 if(lat<-85){lat=-85};
 mm.applyCoords(lat,lng);
-if(mm.mode){mm.tbInfo()}else{mm.clearHelp()};
+mm.clearHelp()
+if(mm.mode){
+//mm.tbInfo()
+}else{
+//mm.clearHelp()
+};
 })
 
 _('close-help').onclick=()=>{
-_('help-area').classList.add('hidden');
+_('details-area').classList.add('hidden');
 }
 _('close-explain').onclick=()=>{
 _('explain-area').classList.add('hidden');
@@ -859,22 +1570,18 @@ window.location.reload();
 
 
 _("btnTbox").onclick=()=>{
+//_('explain-area').classList.add('hidden');
 if(mm.mode==1){
-mm.mode=0;
-$('.tbox-mode').addClass("hidden");
-$('.tile-mode').removeClass("hidden");
+mm.tboxData(0)
 }else{
-mm.mode=1;
-$('.tbox-mode').removeClass("hidden");
-mm.tbInfo();
-
+mm.tboxData(1)
 }
 }
 
 
 _("btnGetTile").onclick=()=>{
-var o = st2point(_('m-coords').value);
-mm.loc = o;
+var o=st2point(_('m-coords').value);
+mm.loc=o;
 mm.applyCoords(o.lat,o.lng)
 }
 
@@ -890,36 +1597,62 @@ mm.labelTiles(mm.tbox);
 }
 }
 
+_('btnApplyTbox').onclick=()=>{
+
+mm.clearDT();
+var xi=_('xi-input').value||10;
+
+xi=parseInt(xi);
+mm.xi=xi;
+var yi=_('yi-input').value||10;
+yi=parseInt(yi);
+mm.yi=yi;
+//mm.static(1);
+if(mm.tile){
+mm.applyTbox(mm.tile.n,mm.xi,mm.yi);
+mm.drawTile();
+}
+}
+
+_("btnAdapt").onclick=()=>{
+mm.adaptBag()
+}
+
+
 _("btnApplyGeo").onclick=()=>{
 //alrt('locating');
-mm.clearDT();
-var cb = function(obj){
-var lat = DT.nFormat(obj.lat);
-var lng = DT.nFormat(obj.lng);
-var latlng = lat + "," + lng;
+mm.clearDT(1);
+mm.static(0);
+var cb=function(obj){
+var lat=DT.nFormat(obj.lat);
+var lng=DT.nFormat(obj.lng);
+var latlng=lat + "," + lng;
 localStorage.setItem("lastMarker",latlng);
-_('m-coords').value = latlng;
+_('m-coords').value=latlng;
 var tile=DT.find(lat,lng,mm.g);
+
 if(tile){
 mm.tile=tile;
-_('m-number').value = mm.tile.n;
+_('tn-number').value=mm.tile.n;
 mm.drawTile();
 mm.drawSurround();
+mm.fit();
 }
+
 //console.log(obj)
 }
 locate(cb);
 }
 
 _("level").onchange=(e)=>{
-mm.g = parseInt(_("level").value);
+mm.g=parseInt(_("level").value);
 localStorage.setItem("level",''+mm.g)
 }
 
-_("m-number").onchange=(e)=>{
+_("tn-number").onchange=(e)=>{
 }
 
-_("perimeter").onchange=(e)=>{mm.perimeter = parseInt(_("perimeter").value)||1}
+_("perimeter").onchange=(e)=>{mm.perimeter=parseInt(_("perimeter").value)||1}
 
 _("btnApplyNumber").onclick=()=>{
 
@@ -934,10 +1667,10 @@ mm.tbInfo(_('tb-number').value);
 }
 
 _('btnTileInfo').onclick=()=>{
-mm.qInfo(_('m-number').value);
+mm.qInfo(_('tn-number').value);
 }
 
-_('btnCopyTN').onclick=()=>{copyText(_('m-number'))}
+_('btnCopyTN').onclick=()=>{copyText(_('tn-number'))}
 _('btnCopyTB').onclick=()=>{copyText(_('tb-number'))}
 _('btnCopyM').onclick=()=>{copyText(_('m-coords'))}
 _('btnFit').onclick=()=>{
@@ -948,15 +1681,75 @@ _('btnExplain').onclick=()=>{
 $('#explain-area').removeClass('hidden');
 }
 
+
 _('btnClear').onclick=()=>{
+mm.clearTiles();
+mm.gjLayer.clearLayers();
 mm.popups.forEach(popup=>popup.remove());
 mm.popups=[];
+if(mm.tileLayer){
+mm.tileLayer.clearLayers();
+}
 mm.clearDT()
+}
+
+
+_('btnDownloadGJ').onclick=()=>{
+mm.pixIt(mm.tbag.gj,2,mm.tbag.g,mm.shell);
+
+}
+
+
+_('btnShowGJ').onclick=()=>{
+if(mm.gjShown==1){
+mm.gjShow(0)
+}else{
+mm.gjShow(1)
+}
+}
+
+_('btnPerGJ').onclick=()=>{
+//console.log(mm.tbag)
+
+mm.pixIt(mm.tbag.gj,1,mm.tbag.g,mm.shell);
+}
+
+_('btnDigGJ').onclick=()=>{
+mm.static(1);
+mm.pixIt(mm.tbag.gj,0,mm.tbag.g,mm.shell);
+}
+
+_('btnRmvGJ').onclick=()=>{
+mm.clearDT(true);
+hide('gjBtns');
 }
 
 }//initEvents
 
+
 //***** helpers start
+
+hide=(l)=>{
+var el=_(l);
+el.classList.add('hidden');
+}
+
+show=(l)=>{
+var el=_(l);
+el.classList.remove('hidden');
+}
+
+makeOn=(l)=>{
+var el=_(l);
+el.classList.remove("unchecked");
+el.classList.add("checked");
+}
+
+makeOff=(l)=>{
+var el=_(l);
+el.classList.remove("checked");
+el.classList.add("unchecked");
+}
 
 function st2point(st){
 var o
@@ -964,8 +1757,8 @@ var arr=st.trim().split(',');
 if(arr.length>1){
 var lat=Number(arr[0]);
 var lng=Number(arr[1]);
-lat = DT.wrapN(lat,-90,90);
-lng = DT.wrapN(lng,-180,180);
+lat=DT.wrapN(lat,-90,90);
+lng=DT.wrapN(lng,-180,180);
 //if(lat>=-90&&lat<=90&&lng>=-180&&lng>=-180){
 o={lat:lat,lng:lng}
 //}
@@ -983,11 +1776,11 @@ return r
 }
 
 function displayOn(l){
-var el = _(l);if(el){el.classList.remove('hidden')}
+var el=_(l);if(el){el.classList.remove('hidden')}
 }
 
 function displayOff(l){
-var el = _(l);
+var el=_(l);
 if(el){el.classList.add('hidden')}
 }
 
@@ -1004,30 +1797,26 @@ return ret
 function _(d){return document.getElementById(d)}
 
 function myDistance(tn,el){
-var tile = new DT.Tile(tn);
+var tile=new DT.Tile(tn);
 
-var cb = function(obj){
-var lat = DT.nFormat(obj.lat);
-var lng = DT.nFormat(obj.lng);
-var point = [lat,lng]
+var cb=function(obj){
+var lat=DT.nFormat(obj.lat);
+var lng=DT.nFormat(obj.lng);
+var point=[lat,lng]
 var dist=tile.dist(point);
 
 if(dist==0){
-dist = "Inside Tile"
+dist="Inside Tile"
 }else{
-dist = DT.nFormat((dist / 1000),2)
-dist = dist + " km";
+dist=DT.nFormat((dist / 1000),2)
+dist=dist + " km";
 }
 
 alrt(dist);
-if(el){ el.innerHTML = dist }
+if(el){ el.innerHTML=dist }
 }
 
 locate(cb);
-
-
-
-
 }
 
 function getJSON(tl){
@@ -1035,7 +1824,7 @@ function getJSON(tl){
 var dname;
 dname=tl +".json"
 j=DT.tileJSON(tl,6,1);
-
+j=JSON.stringify(j,null,2)
 let a=document.createElement("a")
 a.download=dname;
 j=new Blob([j], {type: "text/plain"});
@@ -1046,11 +1835,13 @@ a.click();
 function tbJSON(tb,nice){
 var dname;
 dname=tb.replace(".","_") +".json"
-var tbox = new DT.Tbox(tb);
+var tbox=new DT.Tbox(tb);
+j=tbox.gridJSON;
+
 if(nice){
-j = tbox.niceGridJSON;
+j=JSON.stringify(j,null,2);
 }else{
-j = tbox.gridJSON;
+j=JSON.stringify(j);
 }
 let a=document.createElement("a")
 a.download=dname;
@@ -1065,7 +1856,8 @@ var dname;
 if(q.p){
 j=DT.outlineJSON(p2tile(tl),q.p);
 dname=(""+tl).replace(".","_")  + "_outline"  + ".json"
-let a=document.createElement("a")
+let a=document.createElement("a");
+j=JSON.stringify(j,null,2)
 a.download=dname;
 j=new Blob([j], {type: "text/plain"});
 a.href=URL.createObjectURL(j);
@@ -1086,19 +1878,14 @@ _('message-area').classList.add('hidden');
 function mapinfo(text){
 _('info-text').innerHTML=text;
 _('info-area').classList.remove('hidden');
-setTimeout(()=>{
-_('info-text').innerHTML="";
-_('info-area').classList.add('hidden');
-},6000);
 }
 
 function copyText(txt){
 if(DT.validDD(txt)){
-//console.log("dd")
 }
-var text = txt;
+var text=txt;
 if(txt instanceof HTMLElement){
-text = txt.value;
+text=txt.value;
 }
 navigator.clipboard.writeText(text)
 .then(() => {
@@ -1123,12 +1910,12 @@ alrt("Geolocation is not supported by this browser.");
 }
 }
 function showPosition(position,cb) {
-const lat = position.coords.latitude;
-const lng = position.coords.longitude;
+const lat=position.coords.latitude;
+const lng=position.coords.longitude;
 if(cb){
 cb({lat:lat,lng:lng})
 }else{
-console.log(`Latitude: ${lat}, Longitude: ${llng}`);  
+console.log(`Latitude: ${lat}, Longitude: ${llng}`);
 }
 }
 function showError(error) {
@@ -1179,8 +1966,23 @@ r=JSON.parse(r);
 catch(e){};
 return r;
 }
+
+function validJSON(st){
+var jValid=true;
+try{
+var o=JSON.parse(st)
+}catch(e){jValid=false}
+return(jValid);
+}
+
+function pushUnique(array,v){
+if(!array.includes(v)){
+array.push(v)
+}
+}
+
 //***** helpers end
 
 init();
-alrt('Click on a map to show a tile');
+alrt('Click on a map to show a tile and a tile-box');
 </script>
