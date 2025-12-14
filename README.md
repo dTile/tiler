@@ -58,6 +58,8 @@ var geoJSON = new DT.Tbox(100,9,9).gridSON
 
 
 [Tile and tilebox test](https://dtile.github.io/tiler/test/)
+[Test](./docs/test/)
+
 
 <br>
 
