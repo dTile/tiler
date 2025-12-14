@@ -1,7 +1,10 @@
-
 ((exports)=>{
 var root = {x:0,y:0,g:0};
-const version = "0.0.8";
+const version = "0.0.9a";
+var node=(typeof window === 'undefined' && typeof document === 'undefined');
+
+var src
+if(!node){src= document.currentScript.src;}
 
 /**
 * @class Tile
@@ -57,7 +60,7 @@ this.x = d.x;
 this.y = d.y;
 //this.el = el||0;
 this.g = d.g;
-this.n = this.number = Number(n);
+this.n = this.number = ""+n;
 }
 
 set p(l){this._p=l}
@@ -106,44 +109,43 @@ dist(point){
 var ret;
 try{
 var coords= this.coords;
-	if(inPoly(point,coords)){
-		console.log("Inside tile")
-		return 0
-	}
+if(inPoly(point,coords)){
+console.log("Inside tile")
+return 0
+}
 let minDistance = Infinity;
 
-    // Iterate through each edge of the square
-    for (let i = 0; i < coords.length; i++) {
-        const p1 = coords[i];
-        const p2 = coords[(i + 1) % coords.length];
+// Iterate through each edge of the square
+for (let i = 0; i < coords.length; i++) {
+const p1 = coords[i];
+const p2 = coords[(i + 1) % coords.length];
 
-        // Calculate distance from point to line segment (p1-p2)
-        const dx = p2[1] - p1[1];
-        const dy = p2[0] - p1[0];
-        const lengthSq = dx * dx + dy * dy;
+// Calculate distance from point to line segment (p1-p2)
+const dx = p2[1] - p1[1];
+const dy = p2[0] - p1[0];
+const lengthSq = dx * dx + dy * dy;
 
-        let t = 0;
-        if (lengthSq !== 0) {
-            t = ((point[1] - p1[1]) * dx + (point[0] - p1[0]) * dy) / lengthSq;
-            t = Math.max(0, Math.min(1, t)); // Clamp t to [0, 1] for segment
-        }
-
-        const closestLon = p1[1] + t * dx;
-        const closestLat = p1[0] + t * dy;
-        const d = distance(point, [closestLat,closestLon]);
-        ret = minDistance = Math.min(minDistance, d);
-		
-    }
-    }catch(e){console.log(e)}
-
-    return ret;
+let t = 0;
+if (lengthSq !== 0) {
+t = ((point[1] - p1[1]) * dx + (point[0] - p1[0]) * dy) / lengthSq;
+t = Math.max(0, Math.min(1, t)); // Clamp t to [0, 1] for segment
 }
 
+const closestLon = p1[1] + t * dx;
+const closestLat = p1[0] + t * dy;
+const d = distance(point, [closestLat,closestLon]);
+ret = minDistance = Math.min(minDistance, d);
+
+}
+}catch(e){console.log(e)}
+return ret;
+}
 
 /*****
 * @function expand (xi,yi) : Tbox
 * returns a Tilebox which has its anchor at the tile and incremented xi to the east and yi to the south
 */
+
 expand(xi,yi){
 var x2 = xi;
 x2 = parseInt(x2);
@@ -160,14 +162,11 @@ return expanded;
 */
 
 surround(l){
-var g = this.g;
-var x = this.x;
-var y = this.y;
-var max = Math.pow(10,g);
+var ret,g = this.g,x = this.x,y = this.y,max = this._max;
 var newX = x - l;
 var newY = y - l;
 var o = objectCopy(this.options);
-if(newX<0){	
+if(newX<0){
 newX+=max;
 o.offset=this.offset-1
 }
@@ -176,11 +175,9 @@ if(newY<0){newY=0}
 var anchor = encode(g,newX,newY);
 //console.log(anchor)
 var yi,xi;
-yi = xi = l + l-1;
-//var o={offset:this.offset,p:this.p};
-//if((newX+xi)>=max){	xi = max - newX - 1}
-if((newY+yi)>=max){	yi = max - newY - 1}
-var ret;
+yi = xi = l + l;
+if((newY+yi)>=max){yi = max - newY - 1}
+
 ret = new Tbox(anchor,xi,yi,o);
 //console.log(ret)
 return ret;
@@ -211,7 +208,7 @@ class Tbox{
 *   const n = new DT.Tbox(155,1,1) returns a tilebox that contains tiles numbers 155,156,165,166
 *   const n = new DT.Tbox(155.221) returns the tilebox that containe 3 x 3 tiles with 155 being its northwestern tile anchor
 */
-	
+
 constructor(tn,x2,y2,options){
 if (isNaN(tn)){
 console.log("Non valid tile number");
@@ -220,7 +217,8 @@ return;
 }else{
 this.valid = 1;
 }
-var opt={p:6,offset:0,sh:1}
+
+var opt;
 var n = tn;
 var xi = x2||0;
 var yi = y2||0;
@@ -233,34 +231,49 @@ opt = options;
 if(x2){
 opt = x2;
 }
-
 //constructor 2
 var o = decode(tn)
-xi = o.xi;
-yi = o.xi;
+xi = o.xi||0;
+yi = o.yi||0;
 n = o.tn;
 }
+
+if(!opt){
+opt={p:6,offset:0,sh:1}
+}
+this._options = opt;
+
+
 if (!validTN(n)) throw new TypeError(`invalid tbox number (${n})`);
 this._tn = n; // top left anchor
 this._p=opt.p;
 this._offset=opt.offset;
 
 //if (!validTN(n)) throw new TypeError(`invalid anchor number (${n})`);
-this._xi=xi;
-this._yi=yi;
 var o = decode(n);
 var x = this.x = o.x;
-var g =	this.g = o.g;
 var y = this.y = o.y;
-var max = Math.pow(10,g);
+var g =	this.g = o.g;
+var max=this._max=Math.pow(10,g);
+
+this._xi=xi;
+if(y+yi>max){
+	yi=max-y-1;
+}
+this._yi=yi;
+
+
+
+
 //this._a = Number(n);//anchor
 this.tn=this._at=n;
 var xG = wrapN(x+xi,0,max);
-this._bt = Number(encode(g,xG,y));//northeast tile
-this._ct = Number(encode(g,xG,y+yi));
-this._dt = Number(encode(g,x,y+yi));
+this._bt = encode(g,xG,y);//northeast tile
+this._ct = encode(g,xG,y+yi);
+this._dt = encode(g,x,y+yi);
 var sh = this._sh = 1; //shape
-this.n = this.n = this.number = encode(g,x,y,xi,yi,sh);
+
+this.n = this.number = encode(g,x,y,xi,yi);
 }
 
 set p(l){this._p=l}
@@ -269,11 +282,15 @@ get offset(){return this._offset||0}
 set offset(o){this._offset=o}
 get xi(){return this._xi}
 get yi(){return this._yi}
+set xi(l){this._xi=l}
+get yi(){return this._yi}
+set yi(l){this._yi=l}
 get at(){return this._at}
 get bt(){return this._bt}
 get ct(){return this._ct}
 get dt(){return this._dt}
-
+get options(){return this._options}
+get max(){return this._max}
 
 /**
 * @getter coords : points[]
@@ -309,7 +326,7 @@ return arr;
 
 get lines(){
 return lines(this.at,this.xi,this.yi,this.p,this.offset);
-console.log(offset)
+//console.log(offset)
 }
 
 get list(){
@@ -355,7 +372,8 @@ var x=this.x;
 var y=this.y;
 var xi=this.xi;
 var yi=this.yi;
-var max=Math.pow(10,g);
+//var max=Math.pow(10,g);
+var max=this.max;
 for (let j=y;j<=y+yi+1;j++){
 var jm=j % max;
 var col=[];
@@ -376,11 +394,11 @@ o[tile.n]=a;
 return o
 }
 
-
 /**
 * @getter mosaic() : coords[][]
 * returns an array of arrays that demark the tiles in Tbox
 */
+
 get mosaic(){
 var r = {}
 var o = this.net;
@@ -449,42 +467,18 @@ var y = middle(q[0][0],q[3][0])
 return [y,x]
 }
 
-/*
-get fill(){
-var p=this.precision;
-//console.log(p)
-var arr = [];
-var o = {}
-//var quads =[];
-//var st = this.number;
-var anchor = decode(this.at);
-var g=this.g;
-var x=this.x;
-var y=this.y;
-var xi=this.xi;
-var yi=this.yi;
-var p = this.p;
-for (let i = x ; i <= x+xi; i++){
-for (let j = y; j <= y+yi; j++){
-var v = dtXYG(g,i,j,this.options);
-arr.push(v);
-}
-}
-return arr;
-}
-*/
-
 
 /**
 * @getter tiles: Tile[]
 * Returns an array of tiles that fill a Tbox.
 */
 get tiles(){
-var offset=this.offset;	
+var offset=this.offset;
 var p = this.p;
 var opt = {offset:offset,p:p};
 var g=this.g;
-var max = Math.pow(10,g);
+var max = this.max;
+//var max = Math.pow(10,g);
 var arr = [];
 
 var x=this.x;
@@ -498,7 +492,7 @@ var ii = i;
 if(i>=max){
 opt.offset=offset+1;
 ii=wrapN(i,0,max)
-}else{		
+}else{
 opt.offset=offset;
 }
 var t = new Tile(g,ii,j,opt);
@@ -530,28 +524,430 @@ features.push(ftr);
 }
 })
 var j={type:"FeatureCollection",id:this.n,features:features,bbox:pbox};
-j=JSON.stringify(j);
+//j=JSON.stringify(j);
 return j
 }
 
 get outlineJSON(){
 var o;
-var params={name:this.number,type:"tbox"};
+var params={name:this.n,type:"tbox"};
 var ftr=feature(this.coords,params,this.bbox);
 var features=[ftr];
 var j={type:"FeatureCollection",features:features,bbox:pbox};
-j=JSON.stringify(j,null,2);
+//j=JSON.stringify(j,null,2);
 return j
 }
 
-get niceGridJSON(){
-var j=this.gridJSON;
-j=JSON.parse(j);
-j=JSON.stringify(j,null,2);
-return j;
+tbag(bag){
+var ret = new Tbag(this.n,this.options);
+return ret;
+}
+
+includes(tn){
+var ret;
+var tile = decode(tn);
+if(tile && tile.x>this.x && tile.x<(this.x+this.xi) && tile.y>this.y && tile.y<(this.y+this.yi)){ret=1}
+return ret;
+}
+
+inflate(l){
+var max = this.max;
+	//Math.pow(10,this.g);
+var offset = this.offset;
+var x = this.x;
+var y = this.y;
+var xi = this.xi;
+var yi = this.yi;
+var xLast = x+xi;
+var yLast = y+yi;
+var difY=l;
+if((y-l)<0){
+difY = y;
+}
+
+y=y-difY;
+yi+=difY;
+difY=l;
+if(yLast+l>=max){
+difY = max - yLast;	
+}
+yi+=difY;
+
+if((x-l)<0){
+offset-=1;
+x=(max + x) -l
+}else{
+	x=x-l;
+}
+
+
+xi+=(l+l)
+
+
+this.x=x;
+this.y=y;
+this.xi=xi;
+this.yi=yi;
+this.offset=offset;
+this.tn = encode(this.g,x,y);
+this.n = encode(this.g,x,y,xi,yi);
+//this = new Tbox(tn,{p:this.p,offset:offset})
+return this
 }
 
 }//class tbox
+
+
+
+class Tbag extends Tbox{
+/**
+* @class Tbag extends Tbox
+* Adds a bag property that hold lists of tiles with various levels in order to create perimeters or digitize polygons
+*
+* Constructor 1:
+* tb {Number} - number of the tilebox.
+* bag {object} - object with lists of tiles.
+* options: as in Tbox
+*
+*/
+
+constructor(tb,options,bg){
+if (!validTN(tb)){
+console.log("Non valid tile number");
+return;
+}else{
+super(tb,options);
+if(filled(bg)){
+this._bag=bg;
+}else{
+this._bag = {}
+}
+this._gj={};
+this.valid = 1;
+}
+}
+
+get bag(){return this._bag}
+set bag(bg){this._bag=bg}
+get gj(){return this._gj}
+set gj(j){this._gj=j}
+
+tbox(){
+//return the parent	
+var ret = new Tbox(this.n,this.options);
+return ret;
+}
+
+addList(level,list){
+this.initiateLevel(level);
+var bagLevel = this.getLevel(level);
+bagLevel.tiles = list;
+}
+
+addToList(level,list){
+if(!this.getLevel(level)){
+this.initiateLevel(level);	
+}
+var bagLevel = this.getLevel(level);
+bagLevel.tiles = bagLevel.tiles.concat(list);
+}
+
+addProp(level,prop){
+if(!this.getLevel(level)){
+this.initiateLevel(level);	
+}
+var bagLevel = this.getLevel(level);
+bagLevel.prop = Object.assign(prop,{level:level});
+}
+
+threshold(incr){
+incr = parseInt(incr)||0;
+if(!(incr)){
+console.log("No increment")
+return;
+}
+var level = 3;
+var maxLevel = 1;
+var bag = this._bag;
+for(let i = 1; i <=9; i += 1){
+if(this.getLevel(i)){maxLevel=i}else{break}
+}
+
+//console.log(maxLevel)
+level = maxLevel+1;
+this.initiateLevel(level);
+var newLevel = this.getLevel(level);
+var core = this.getLevel(maxLevel-1);
+var crust = this.getLevel(maxLevel);
+let tainted = core.tiles.concat(crust.tiles);
+
+//console.log(tainted.length)
+crust.tiles.forEach(tn=>{
+var tile = new Tile(tn);
+
+var adjs = [];
+/*
+adjs.push(encode(tile.g,tile.x,tile.y-1))
+adjs.push(encode(tile.g,tile.x,tile.y+1))
+adjs.push(encode(tile.g,tile.x+1,tile.y))
+adjs.push(encode(tile.g,tile.x-1,tile.y))
+*/
+
+var tbox = tile.surround(parseInt(incr)||1);
+	
+adjs = tbox.list;	
+adjs.forEach(adj=>{
+if(tainted.includes(adj)){}else{
+pushUnique(newLevel.tiles,adj)
+pushUnique(tainted,adj);
+}		
+})
+})
+var tiles = [...new Set(bag[""+level].tiles)];//remove duplicates
+bag[""+level].tiles = tiles;
+}
+
+exportJSON(){
+var j,features = [],ftr;
+var params={name:this.n,type:"tbox",noFill:1};
+var pbox = this.bbox;
+ftr=feature(this.coords,params,pbox);
+//features.push(ftr);	
+
+	
+//var bag = this._bag;
+for(let i = 1 ; i < 9; i++){	
+var bagLevel = 	this.getLevel(i);
+if(bagLevel){
+var tiles = bagLevel.tiles;
+//console.log(levelList.length)
+tiles.forEach(tn=>{
+var params=Object.assign(bagLevel.prop,{n:tn,name:tn,type:"tile",level:i});
+var tile = new Tile(tn);
+ftr=feature(tile.coords,params);
+features.push(ftr);
+})
+//if(!(levelList.length)){break}
+}
+}
+var j={type:"FeatureCollection",id:this.n,features:features};
+//j=JSON.stringify(j);
+return j
+}
+
+
+digitize(j){
+
+function countCorners(coords,poly){
+var corners = 0;
+coords.forEach(vertice=>{
+if(inPoly(vertice,poly)){corners+=1}
+})
+return corners
+}
+
+if(j){this._gj=j}
+var gjSource = this.gj;
+if(filled(gjSource)){
+var polygons = polysJSON(gjSource,this.p)
+//console.log(gjSource);
+var list = this.list;
+var st = list.toString();
+//st = coordsE(st)
+//console.log(st)
+//console.log(st.length)
+
+var level1=[],level2=[];
+
+polygons.forEach(poly=>{
+list.forEach(tn=>{
+var coords = new Tile(tn).coords;
+//var poly=[];
+var corners=countCorners(coords,poly);
+if(corners>3){
+pushUnique(level1,tn);
+//tileAdd(q.n,1);
+}else if(corners > 0){
+pushUnique(level2,tn);
+}
+})
+})
+this.addList(1,level1);
+this.addList(2,level2);
+//console.log(this._bag)
+}
+}
+
+initiateLevel(l){
+this._bag[""+l]={prop:{level:l},tiles:[],boxes:[]}
+}
+
+getLevel(l){
+var bl;
+if(this._bag[""+l]){bl = this._bag[""+l]}
+
+//if(Array.isArray(this._bag[""+l].tiles)){arr=this._bag[""+l].tiles||[]};
+return bl
+}
+
+/**
+* @method adapt
+* changes tbox sizing to delimit all tiles in tbag
+*/
+
+adapt(threshold){
+
+var tiles=[],boxes;
+var minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+
+for(let i=1;i<7;i++){
+var bagLevel=this.getLevel(i);
+	
+if(bagLevel){
+
+tiles = bagLevel.tiles;
+tiles.forEach(tn=>{
+var tile = new Tile(tn);
+var x = tile.x;
+var y = tile.y;
+if(x>maxX){maxX=x}
+if(y>maxY){maxY=y}
+if(x<minX){minX=x}
+if(y<minY){minY=y}
+})
+}
+}
+
+if(maxY>=0){
+var xi=maxX-minX;
+var yi=maxY-minY;
+if(minX<0){
+minX=minX+this.max;
+this.offset-=1;
+}
+
+this.x = minX;
+this.y = minY;
+this.xi =xi;
+this.yi =yi;
+this.tn=encode(this.g,this.x, this.y)
+this.n=encode(this.g,this.x, this.y,this.xi,this.yi)
+}
+
+return this
+}
+
+rasterize(){
+var tiles=[],boxes;
+var tboxX,tboxXI,chunk,opened,chunkStart;
+	
+
+for(let i=1;i<7;i++){
+var bagLevel=this.getLevel(i);
+	
+if(bagLevel){
+bagLevel.boxes = [];
+tiles = bagLevel.tiles;
+
+for(let row=this.y;row<=this.y+this.yi;row++){
+opened=false;
+tboxXI = 0;
+tboxX = 0;
+console.log(tiles.length);
+var lastCol = this.x+this.xi;
+for(let col=this.x;col<=lastCol;col++){
+var tn = encode(this.g,col,row);
+
+if(tiles.includes(tn)){
+if(opened){
+tboxXI+=1
+}else{
+chunkStart = tn;
+opened = true;
+tboxX = col;
+}
+
+}else{
+
+if(opened){
+opened=false
+chunk = chunkStart+"."+tboxXI + (''+tboxXI).length;
+bagLevel.boxes.push(chunk);
+tboxXI=0
+}	
+	
+}
+
+}
+}
+
+}
+}	
+	
+}
+
+rasterJSON(){
+var features = [];
+for(let i=1;i<7;i++){
+var bagLevel=this.getLevel(i)
+if(bagLevel){
+bagLevel.boxes.forEach((n)=>{
+var coords;
+var tile = new Tbox(n,this.options);
+coords=tile.coords;
+if(coords){
+var params=Object.assign({name:n,type:"tbag"},bagLevel.prop);
+var nw=flip(coords[0]);
+var ne=flip(coords[1]);
+var se=flip(coords[2]);
+var sw=flip(coords[3]);
+var ftr=DT.feature(coords,params);
+//var bbox=[sw[0],sw[1],ne[0],ne[1]];
+//ftr.bbox = bbox;
+features.push(ftr);
+}
+})
+}
+}
+var j={type:"FeatureCollection",features:features};
+return j;
+}
+
+
+bagJSON(){
+var features = [];
+for(let i=1;i<7;i++){
+var bagLevel=this.getLevel(i)
+if(bagLevel){
+bagLevel.tiles.forEach((tn)=>{
+var coords;
+var tile = new Tile(tn,this.options);
+coords=tile.coords;
+if(coords){
+var params=Object.assign({name:tn,type:"tile"},bagLevel.prop);
+var nw=flip(coords[0]);
+var ne=flip(coords[1]);
+var se=flip(coords[2]);
+var sw=flip(coords[3]);
+var ftr=DT.feature(coords,params);
+//var bbox=[sw[0],sw[1],ne[0],ne[1]];
+//ftr.bbox = bbox;
+features.push(ftr);
+}
+})
+}
+}
+var j={type:"FeatureCollection",features:features};
+return j;
+}
+	
+
+
+}//class tbag
+
+
+/* classes end
+
 
 /**
 * @function find(lt,ln,g,p): new Tile
@@ -592,34 +988,43 @@ return o
 }
 
 /**
-* @function findBox(g,north,west,south,east,p): new Tbox
-* Returns a tbox that its north wester tile surrounts [north,west] and its opposing tile surrounds [south,east].
+* @function findBox([north,west,south,east],g,p): new Tbox
+* Returns a tbox that its north western tile surrounts [north,west] and its opposing tile surrounds [south,east].
 *
 * g: {1 to 9} granularity
-* p: {5 to 12} decimal presicision
+* 4: {5 to 12} decimal presicision
 *
 */
 
-function findBox(g,north,west,south,east,p){
-var ret;
+function findBox(bounds,g,p){
+var ret
+if(!validCoords(bounds)){
+console.log("Valid bounds format should be: [north,west],[south,east]]");
+return}
+var north=bounds[0][0];
+var west=bounds[0][1];
+var south=bounds[1][0];
+var east=bounds[1][1];
 if(!g){return}
 var nw = find(north,west,g);
+
 var se = find(south,east,g);
 var max=Math.pow(10,g);
 //var xmod=x % n;
 //var ymod=y % n;
 if(g==1){
-ret	= new Tbox(100,19,9)
+ret	= new Tbox(100,9,9)
 }else{
 if(nw&&se){
 var xi = se.x-nw.x;
+
 var yi = se.y-nw.y;
 //console.log(se.x + " " + nw.x)
 if(xi<0){xi=max+xi;}
 if(xi>max){	xi=xi-max;}
 //ret =  encode(g,nw.x,nw.y,xi,yi);
-var tile = encode(g,nw.x,nw.y);
-ret =  new Tbox(tile,xi,yi)
+var tn = encode(g,nw.x,nw.y);
+ret =  new Tbox(tn,xi,yi)
 }
 }
 
@@ -668,7 +1073,9 @@ if(e<0){deep=true};
 var paddedX2=""//String(xmod).padStart(g,'0');
 var decimal=""
 //
-if(x2 || y2){
+if(isNumeric(x2)){
+if(!(x2)){x2=0}
+if(!(y2)){y2=0}
 var f = Math.max((''+x2).length,(''+y2).length)
 var paddedY2=String(y2).padStart(f,'0');
 var paddedX2=String(x2).padStart(f,'0');
@@ -717,12 +1124,13 @@ return st;
 /**
 * @function decosde(l,p): returns a Tile or a Tbox
 * l {String}: tile number or tbox number
-* p:{5-12}: decimal precision
+* p:{4-12}: decimal precision
 *
 */
 
-function decode(l,precision=6){
-var o={};
+decode=(l,p,offset)=>{
+var o={},isTbox;
+/*
 function splitToChunks(str,size) {
 const result = [];
 for (let i = 0; i < str.length; i += size) {
@@ -730,7 +1138,7 @@ result.push(str.substring(i, i + size));
 }
 return result;
 }
-
+*/
 if(!validTN(l)){return}
 if(l==0){
 o.n=0;
@@ -754,6 +1162,7 @@ var decimal = "";
 var xi,yi,e=0,ei=0;
 var arr = st.split(".");
 if(arr.length>1){
+isTbox=1;
 decimal=p=arr[1]
 }
 st = arr[0];
@@ -761,47 +1170,41 @@ g = st[0]
 g = parseInt(g);
 st=st.slice(1);
 //f=decimal[-1]
-f = parseInt(decimal.slice(-1));
 const firstPart=st.substring(0,g);
 var x=parseInt(firstPart);
 const secondPart=st.substring(g,2*g);
 var thirdPart = st.substring(2*g);
 var y=parseInt(secondPart);
 if(thirdPart){
-	e=parseInt(thirdPart);
+e=parseInt(thirdPart);
 }
 if(decimal){
 //var f=Math.floor(decimal.length/2);
 //var f=Math.floor(decimal.length/2);
-
+f = parseInt(decimal.slice(-1));
 decimal = decimal.slice(0,-1);
-xi = decimal.substring(0,f);
+xi = decimal.substring(0,f)||0;
 xi=parseInt(xi);
-yi = decimal.substring(f,f+f);
+yi = decimal.substring(f,f+f)||0;
 yi=parseInt(yi);
+
 thirdPart =  decimal.substring(f+f);
 if(thirdPart){
 ei=parseInt(thirdPart)||0;
-}	
-
 }
-
-//var o = dtXYG(g,x,y,xi,yi,precision)
+}
 
 if(g){
 //var number = encode(g,x,y,xi,yi,"1",e||"",e2||"");
-var number = encode(g,x,y,xi,yi,e||"",ei||"");
-o={x:x,y:y,g:g,name:x+':'+y+':'+g,number:number,n:number};
-
+var n = encode(g,x,y,xi,yi,e||"",ei||"");
+o={x:x,y:y,g:g,name:x+':'+y+':'+g,n:n};
 o.tn = encode(g,x,y);
-//if(perimeter){v.p=perimeter}
 if(!!(ei) || !!(e)){
-	o.e=e;
-	o.ei=ei;
+o.e=e;
+o.ei=ei;
 }
 
-if(xi){o.xi=xi};
-if(yi){o.yi=yi};
+if(isTbox){o.xi=xi,o.yi=yi};
 //TODO extract e and ei from the remainder
 //if(e){o.e=e};
 //if(ei){o.ei=ei};
@@ -811,7 +1214,8 @@ if(yi){o.yi=yi};
 }
 
 //console.log(o)
-o.p = precision||6;
+o.p = p||6;
+o.offset = offset||0;
 return o;
 }
 
@@ -890,11 +1294,13 @@ features.push(ftr);
 }
 
 var j={type:"FeatureCollection",features:features};
+/*
 if(fancy){
 j=JSON.stringify(j,null,2)
 }else{
 j=JSON.stringify(j)
 };
+*/
 return j
 }
 
@@ -994,6 +1400,11 @@ return ok;
 
 function validTN(tn){
 var ok;
+const regex = /[-]?\d*\.?\d+/g;
+ok =regex.test(tn);
+//const regex = /[^0-9-.,]/g;
+//ret = (""+st).match(regex);
+/*
 n = Number(tn);
 if(n !== Infinity){
 n = Math.abs(n);
@@ -1009,6 +1420,7 @@ ok=1;
 }
 }
 if(!(ok)){console.log("valid " + tn + " " + ok);}
+*/
 return ok;
 }
 
@@ -1113,8 +1525,27 @@ cr=[].concat(l);
 cr[0]=l[1];
 cr[1]=l[0];
 }
+//console.log(cr)
 return cr;
 }
+
+function flipCoords(l,p){
+var cr=[];
+if(Array.isArray(l)){
+l.forEach(crd=>{
+crd=flip(crd);
+if(p){
+crd[0]=nFormat(crd[0],p)
+crd[1]=nFormat(crd[1],p)
+}
+cr.push(crd)
+});
+
+}
+//console.log(cr)
+return cr;
+}
+
 
 function wrapN(x, min,max, inc) {
 var d = max - min;
@@ -1139,6 +1570,14 @@ if(isNumeric(st[0]) && isNumeric(st[1])){ok = true}
 return ok
 }
 
+function validCoords(st){
+var ok;
+if(Array.isArray(st)&&st.length>0){
+if(validDD(st[0])){ok = true}
+}
+return ok
+}
+
 function offsetter(crd,offset){
 var cr = normalize(crd);
 if(offset!=0){
@@ -1147,8 +1586,8 @@ cr[1]=cr[1]+incr;
 }
 return cr
 }
-	
-	
+
+
 function inPoly(point,vs){
 var x = point[0], y = point[1];
 var inside = false;
@@ -1173,31 +1612,353 @@ return Math.round(num * pow) / pow;
 }
 
 function distance(p1,p2) {
-	var ret;
-	try{
-    const R = 6371e3;
-	var lat1=p1[0], lon1=p1[1], lat2=p2[0], lon2=p2[1];
-    const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
+var ret;
+try{
+const R = 6371e3;
+var lat1=p1[0], lon1=p1[1], lat2=p2[0], lon2=p2[1];
+const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
+const φ2 = lat2 * Math.PI / 180;
+const Δφ = (lat2 - lat1) * Math.PI / 180;
+const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	ret = R * c;
-	}catch(e){console.log(e)}
-    return ret
+const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+Math.cos(φ1) * Math.cos(φ2) *
+Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+ret = R * c;
+}catch(e){console.log(e)}
+return ret
 }
 function unload(){
-	if(DT){DT={};}	
+if(!node){
+src = src;
+window.DT = {}
+window.DT.load=(cb)=>{
+let script = document.createElement('script');
+script.src = src;
+script.onload = () => {
+//console.log(`Script loaded from: ${src}`);
+    if (cb && typeof cb === 'function') {
+      cb();
+    }
+};
+
+  // Optional: Handle potential errors during loading
+script.onerror = () => {
+console.error(`Error loading script from: ${src}`);
+};
+  // Append the script to the document head to start loading
+document.head.appendChild(script);
 }
+}}
+
+
+/* @function bounds(coords,flipit):object
+* returns object with the corners that enclose an array of coordinates
+* coords : point[] - array of lat,lng coordinates
+* flip : boolean - if flip the source coordinates (for geoJSON)
+*/
+function bounds(coords,flipIt){
+var ret;
+var minLng = Infinity,maxLng=-Infinity,minLat = Infinity,maxLat=-Infinity;
+
+coords.forEach((crd)=>{
+var o=[crd[0],crd[1]]
+if(flipIt)(o=flip(crd));
+if(o[0]>=maxLat){maxLat = o[0]}
+if(o[0]<=minLat){minLat = o[0]}
+if(o[1]<=minLng){minLng = o[1]}
+if(o[1]>=maxLng){maxLng = o[1]}
+})
+if(minLng<Infinity){
+ret = [[maxLat,minLng],[minLat,maxLng]]
+//console.log(ret);
+}
+return ret
+}
+
+/* @function boundsJSON(j):object
+* returns object with the corners that enclose polygons and multipolygons
+* j : geoJSON object
+*/
+
+function boundsJSON(jo,g,p){
+if(jo){j=jo}else{
+var j = {
+"type": "FeatureCollection",
+"features": [
+{
+"properties": {
+"name": 56267336645,
+"type": "tile",
+"noFill": 1
+},
+"geometry": {
+"type": "Polygon",
+"coordinates": [
+[
+[
+45.6228,
+43.262537
+],
+[
+45.6264,
+43.262537
+],
+[
+45.6264,
+43.259916
+],
+[
+45.6228,
+43.259916
+]
+]
+]
+},
+"type": "Feature",
+"bbox": [
+45.6228,
+43.259916,
+45.6264,
+43.262537
+]
+}
+]
+}
+}
+
+
+var ret;
+var currBounds = [];
+var cb=(o)=>{
+if(o.type){
+//console.log(o.type)
+var geometry = o.geometry;
+if(geometry){
+//console.log(geometry.type);
+if(geometry.type == "Polygon"){
+var coords = geometry.coordinates[0]
+//console.log(coords)
+var newBounds = bounds(coords,true)
+
+if(newBounds){
+currBounds.push(newBounds)
+}
+}
+
+if(geometry.type == "MultiPolygon"){
+var multiCoords	= geometry.coordinates;
+multiCoords.forEach((coordinates,i)=>{
+//console.log("iterating " + i)
+var coords = coordinates[0];
+var newBounds = bounds(coords,true)
+if(newBounds){
+currBounds.push(newBounds)
+}
+})
+}
+}
+}
+}
+
+var arr = [];
+traverseAll(j,"geometry",arr,cb);
+if(currBounds.length > 0){
+var merged =[]
+//console.log(currBounds)
+currBounds.forEach((pair,i)=>{
+merged.push(pair[0]);
+merged.push(pair[1]);
+})
+
+//console.log(merged);
+ret = bounds(merged);
+//console.log(ret)
+}
+return ret
+}
+
+function tbagJSON(j,g=4,p=6,maxT){
+var maxTiles = maxT||10000000;
+var bounds=DT.boundsJSON(j,g,p);
+var tbox,tbag,xi,yi;
+tbox= DT.findBox(bounds,g);
+xi = tbox.xi;
+yi = tbox.yi;
+while(xi*yi>maxTiles && filled(tbox)){
+//console.log(xi + " " + yi + " xi*yi " + (xi*yi) );
+console.log("Reducing granularity from " + g +  " to " + (g-1));
+g-=1;
+tbox = DT.findBox(bounds,g);
+xi = tbox.xi;
+yi = tbox.yi;
+}
+if(filled(tbox)){
+tbox.p=p;	
+tbag = tbox.tbag(tbox.n,tbox.options)
+tbag._gj=j;
+tbag.digitize()
+}
+return tbag
+}
+
+function traverseAll(obj,key,array,cb){
+array=array||[];
+if ('object' === typeof obj){
+//console.log(obj.parentNode)
+for (let k in obj) {
+if (k === key){
+if(cb){
+cb(obj,k,array)
+}
+array.push(obj[k]);
+}else{
+traverseAll(obj[k],key,array,cb);
+}
+}
+}
+}
+
+function pushUnique(array,v){
+if(!array.includes(v)){
+array.push(v)
+}
+}
+
+function getArrayDepth(l) {
+return Array.isArray(l) ?
+1 + Math.max(0, ...l.map(getArrayDepth)) :
+0;
+}
+
+function objectCopy(o){
+var r={};
+try{
+r=JSON.stringify(o)
+r=JSON.parse(r);
+}
+catch(e){};
+return r;
+}
+
+function filled(o){
+if (typeof o === 'object' && o !== null && Object.keys(o).length !== 1) return true
+}
+
+function polysJSON(j,p){
+var polygons  = [];
+
+var cb=(o)=>{
+if(o.type){
+//console.log(o.type)
+var geometry = o.geometry;
+if(geometry){
+//console.log(geometry.type);
+
+if(geometry.type == "Polygon"){
+var coords = geometry.coordinates[0]
+coords = flipCoords(coords,p)
+polygons.push(coords);
+}
+
+if(geometry.type == "MultiPolygon"){
+var multiCoords	= geometry.coordinates;
+multiCoords.forEach((coordinates,i)=>{
+var coords = coordinates[0];
+coords = flipCoords(coords,p)
+polygons.push(coords);
+})
+}
+
+}
+}
+}//cb	
+
+
+traverseAll(j,"geometry",polygons,cb);
+return polygons;
+}
+
+function coordsD(string){
+console.log(string.length)
+var hex=""
+for (var i=0; i < string.length; i++){
+hex += ( (i == 0 ? "" : "000") + string.charCodeAt(i).toString(16)).slice(-4)
+}
+hex=hex.replaceAll("a",".");
+hex=hex.replaceAll("b","[");
+hex=hex.replaceAll("c","]");
+hex=hex.replaceAll("d","-");
+hex=hex.replaceAll("e","'");
+hex=hex.replaceAll("f",",");
+console.log(hex.length)
+return hex;
+}
+
+function coordsE(st){
+const regex2 = /^[0-9e,'.[]-]*$/gi;
+const regex = /^[0-9e,'.[]-]*$/g;
+//const regex = /[^0-9-.,]/g;
+var hex = (""+st).replace(regex, '');
+//if (str.match(regex)) {    str = str.replace(regex, "$1" + "1" + "$2");}
+//var hex=st.match(/^[0-9e,'.[]-]*$/gi, '');
+hex=hex.replaceAll(".","a");
+hex=hex.replaceAll("[","b");
+hex=hex.replaceAll("]","c");
+hex=hex.replaceAll("-","d");
+hex=hex.replaceAll("'","e");
+hex=hex.replaceAll(",","f");
+//hex=hex.replaceAll(" ","f");
+var ret=""
+while (hex.length % 4 != 0) { // we need it to be multiple of 4
+hex= "0" + hex;
+}
+for (var i=0; i < hex.length; i+= 4){
+ret += String.fromCharCode(parseInt(hex.substring(i,i + 4), 16)) // get char from ascii code which goes from 0 to 65536
+}
+return ret;
+}
+
+
+function hexToString(hex) {
+//hex = hex.substring(2) // remove the '0x' part
+var string = ""
+
+while (hex.length % 5 != 0) {
+hex =  "0" + hex;
+}
+
+for (var i = 0; i < hex.length; i+= 5){
+string += String.fromCodePoint(parseInt(hex.substring(i,i + 5), 16))
+}
+
+return string;
+}
+
+function stringToHex(string, packing) {
+var hex = ""
+for (var i=0; i < string.length; i+=1) {
+var code = string.codePointAt(i);
+hex += ( (i == 0 ? "" : "0000") + string.codePointAt(i).toString(16)).slice(-5)
+if (code != string.charCodeAt(i)) i++;
+}
+return hex
+//return '0x' + hex.toUpperCase();
+}
+
+
+/*
+var str = hexToString("0x874FAB41900CFAAB1232BB2FA11A49")
+console.log(str)
+console.log(stringToHex(str) == "0x874FAB41900CFAAB1232BB2FA11A49")
+*/
 //helpers end
 
 var exps = {
 Tile:Tile,
 Tbox:Tbox,
+Tbag:Tbag,
 feature:feature,
 bbox:bbox,
 find:find,
@@ -1208,6 +1969,7 @@ embelish:embelish,
 dtXYG:dtXYG,
 lines:lines,
 tileJSON:tileJSON,
+tbagJSON:tbagJSON,
 split100:split100,
 nFormat:nFormat,
 distance:distance,
@@ -1215,16 +1977,22 @@ validTN:validTN,
 validDD:validDD,
 wrapN:wrapN,
 offsetter:offsetter,
+filled:filled,
 inPoly:inPoly,
 flip:flip,
 version:version,
 unload:unload,
+bounds:bounds,
+coordsD:coordsD,
+coordsE:coordsE,
+boundsJSON:boundsJSON,
+node:node
 }
 
-for (const [key, value] of Object.entries(exps)) {
-exports[key] = value 
+for (const [key, value] of Object.entries(exps)){
+exports[key] = value
 }
 
 
 //if (typeof module != 'undefined' && module.exports) {module.exports = exports} else{window.DT = exports;}
-})(typeof exports === 'undefined'? window.DT={}: exports);
+})(typeof exports === 'undefined'?window.DT={}:exports);
